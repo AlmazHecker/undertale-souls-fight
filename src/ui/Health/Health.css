@@ -1,0 +1,11 @@
+.health-bar {
+    background-color: #6c0a03;
+    width: 40px;
+    display: flex;
+    height: 20px;
+    margin: 0 auto;
+}
+
+.health-point {
+    background-color: #b6ab11;
+}
