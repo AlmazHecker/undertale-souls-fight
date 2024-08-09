@@ -19,24 +19,3 @@
     overflow: hidden;
     white-space: nowrap;
 }
-
-.typing-effect {
-    font-size: 24px;
-    position: relative;
-}
-
-
-.typing-effect::after {
-    content: "|";
-    position: absolute;
-    right: 0;
-    color: transparent;
-    width: 100%;
-    background: black;
-}
-
-@keyframes typingEffect {
-    to {
-        width: 0;
-    }
-}

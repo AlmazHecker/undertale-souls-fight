@@ -9,7 +9,7 @@ type HealthBarArgs = {
 export const HealthBar = ({
   initialPoints = 20,
   maxPoints = 20,
-}: HealthBarArgs): [HTMLDivElement, Health] => {
+}: HealthBarArgs) => {
   let points = initialPoints;
   const container = document.createElement("div");
   container.className = "health-bar";
@@ -28,7 +28,7 @@ export const HealthBar = ({
 
   healthPoint.style.width = calculateWidth(points);
 
-  return [container, health];
+  return { container, health };
 };
 
 interface Events {

@@ -10,7 +10,6 @@
 }
 
 .current-soul {
-    /*color: var(--soul-color);*/
     position: absolute;
     top: 55%;
     left: 50%;

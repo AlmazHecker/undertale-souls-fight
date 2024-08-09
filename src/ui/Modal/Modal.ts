@@ -1,12 +1,14 @@
 import css from "./Modal.module.css";
+import { TypingEffect } from "@/ui/TypingEffect/TypingEffect.ts";
 
 export class Modal {
   private visible: boolean = false;
   private modalElement: HTMLDivElement = document.createElement("div");
-  private styleElement: HTMLStyleElement = document.createElement("style");
+  private readonly typingEffect: TypingEffect;
 
   constructor(private readonly title: string) {
     this.modalElement.className = css["modal-wrapper"];
+    this.typingEffect = new TypingEffect({ text: this.title });
   }
 
   show() {
@@ -20,7 +22,7 @@ export class Modal {
     if (this.visible) {
       this.visible = false;
       this.modalElement.remove();
-      this.styleElement.remove();
+      this.typingEffect.remove();
     }
   }
 
@@ -29,20 +31,9 @@ export class Modal {
 
     const modalContent = document.createElement("div");
     modalContent.className = css["modal-content"];
+    modalContent.appendChild(this.typingEffect.render());
 
-    const typingEffect = document.createElement("div");
-    typingEffect.className = css["typing-effect"];
-    typingEffect.textContent = this.title;
-
-    modalContent.appendChild(typingEffect);
     this.modalElement.appendChild(modalContent);
     document.body.appendChild(this.modalElement);
-
-    this.styleElement.innerHTML = `
-          .${css["typing-effect"]}::after {
-            animation: typingEffect 1s steps(${this.title.length}) forwards;
-          }
-        `;
-    document.head.appendChild(this.styleElement);
   }
 }

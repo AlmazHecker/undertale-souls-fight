@@ -6,10 +6,7 @@ import actPng from "../../../assets/fight/act.png";
 import plasterPng from "../assets/img/plaster.png";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { shuffleArray } from "@/utils/helpers/random.helper.ts";
-import {
-  animateWithTimer,
-  callInfinitely,
-} from "@/utils/helpers/timing.helper.ts";
+import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { Knife } from "@/utils/items/Knife.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
@@ -85,6 +82,7 @@ export class KnifeManager {
     let index = 0;
 
     const moveContainer = async () => {
+      if (this.stopRhombusMovement) return;
       const nextPosition = positions[index];
       const startX = this.knifeContainer.x;
       const startY = this.knifeContainer.y;
@@ -98,9 +96,12 @@ export class KnifeManager {
       });
 
       index = (index + 1) % positions.length;
+
+      moveContainer();
     };
 
-    callInfinitely(moveContainer, !this.stopRhombusMovement);
+    moveContainer();
+    // callInfinitely(moveContainer, !this.stopRhombusMovement);
   }
 
   public async createActButton() {

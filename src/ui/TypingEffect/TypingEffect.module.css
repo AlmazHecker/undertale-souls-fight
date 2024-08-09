@@ -1,0 +1,10 @@
+.typing-effect {
+  font-size: 24px;
+  position: relative;
+  white-space: pre;
+}
+
+.cursor {
+  content: "|";
+  background: black;
+}

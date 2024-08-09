@@ -10,8 +10,10 @@ import { PurpleGame } from "@/levels/PurpleHeart/PurpleGame.ts";
 import { GreenGame } from "@/levels/GreenHeart/GreenGame.ts";
 import { YellowGame } from "@/levels/YellowHeart/YellowGame.ts";
 import { CurrentSoul } from "@/ui/CurrentHeart/CurrentHeart.ts";
+import { GameOver } from "@/ui/GameOver/GameOver.ts";
 
 export class View {
+  private readonly health = HealthBar({});
   private readonly levels = [
     CyanGame,
     OrangeGame,
@@ -28,7 +30,8 @@ export class View {
   ) {}
 
   initialize() {
-    return this.container.append(Intro({ nextView: this.nextView }));
+    // this.container.append(GameOver());
+    this.container.append(Intro({ nextView: this.nextView }));
     // return this.setupView();
   }
 
@@ -44,16 +47,35 @@ export class View {
   };
 
   setupView = async () => {
-    const [healthBar, health] = HealthBar({});
     const currentGame = this.levels[this.currentLevel];
 
-    const game = new currentGame(this.app, this.heart, health, this.nextView);
-    await GameLevel({ game });
+    const game = new currentGame(
+      this.app,
+      this.heart,
+      this.health.health,
+      this.nextView,
+    );
+    console.log("CURRENT GAME", game);
+    await GameLevel({ game, onLose: this.gameOver });
 
     const currentSoul = CurrentSoul({ soulIndex: this.currentLevel });
     this.container.append(currentSoul);
 
     this.container.append(this.app.canvas);
-    this.container.append(healthBar);
+    this.container.append(this.health.container);
+  };
+
+  gameOver = () => {
+    this.container.innerHTML = "";
+    this.container.append(
+      GameOver({
+        onEnter: () => {
+          this.health.health.setHealthPoints(20);
+          this.container.innerHTML = "";
+          this.currentLevel--;
+          this.nextView();
+        },
+      }),
+    );
   };
 }

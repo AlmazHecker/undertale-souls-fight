@@ -1,11 +1,10 @@
 import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
 
-import { Heart } from "../../utils/items/Heart.ts";
+import { Heart } from "@/utils/items/Heart.ts";
 import { KnifeManager } from "./helpers/KnifeManager.ts";
-import { BaseGame } from "../../utils/helpers/BaseGame.ts";
-import { createTicker } from "../../utils/helpers/pixi.helper.ts";
-import { Health } from "../../ui/Health/Health.ts";
+import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { Health } from "@/ui/Health/Health.ts";
 
 export class CyanGame extends BaseGame {
   private knifeManager: KnifeManager;
@@ -26,13 +25,12 @@ export class CyanGame extends BaseGame {
     this.startGameLoop();
 
     this.emit("status", "STARTED");
-    this.on("status", this.statusListener);
+
     this.ticker.start();
     return this;
   }
 
   startGameLoop() {
-    this.ticker = createTicker();
     this.ticker.add(() => {
       const collisions = this.knifeManager.infiniteKnivesAnimation();
       this.isBtnAndHeartColliding =
