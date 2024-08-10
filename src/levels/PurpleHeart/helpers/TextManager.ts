@@ -137,7 +137,7 @@ export class TextManager {
         const originalY = text.y;
         positions.push({ y: originalY });
 
-        return vibrate(text, 2000, originalY);
+        return vibrate({ container: text, duration: 2000, y: originalY });
       }),
     );
 

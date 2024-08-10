@@ -2,8 +2,9 @@ import { Application, Assets, Container, Sprite } from "pixi.js";
 import starPng from "../assets/img/star.png";
 import musicPng from "../assets/img/music.png";
 import { Star } from "../assets/sprite/Star.ts";
-import { Heart } from "../../../utils/items/Heart.ts";
-import { arePolygonsColliding } from "../../../utils/helpers/pixi.helper.ts";
+import { Heart } from "@/utils/items/Heart.ts";
+import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
+import { vibrate } from "@/utils/helpers/timing.helper.ts";
 
 export class StarManager {
   public starContainer = new Container<Sprite>();
@@ -63,12 +64,17 @@ export class StarManager {
       star.rotation = 0;
       star.texture = musicTexture;
       star.tint = "#07a108";
+      vibrate({
+        container: star,
+        duration: 20000,
+        y: star.y,
+        x: star.x,
+        intensity: 0.5,
+      });
     }
   }
 
   destroy() {
-    this.app.stage.children.forEach((child) => {
-      if (child.label === "star") child.destroy();
-    });
+    this.app.stage.removeChild(this.starContainer);
   }
 }

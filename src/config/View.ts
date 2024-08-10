@@ -1,6 +1,6 @@
 import { CyanGame } from "@/levels/CyanHeart/CyanGame.ts";
 import Intro from "../ui/Intro/Intro.ts";
-import { HealthBar } from "@/ui/Health/Health.ts";
+import { Health } from "@/ui/Health/Health.ts";
 import { GameLevel } from "@/ui/GameLevel/GameLevel.ts";
 import { Application } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.ts";
@@ -13,7 +13,7 @@ import { CurrentSoul } from "@/ui/CurrentHeart/CurrentHeart.ts";
 import { GameOver } from "@/ui/GameOver/GameOver.ts";
 
 export class View {
-  private readonly health = HealthBar({});
+  private readonly health = new Health();
   private readonly levels = [
     CyanGame,
     OrangeGame,
@@ -22,17 +22,17 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 0;
+  private currentLevel = 1;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,
     private readonly heart: Heart,
   ) {}
 
-  initialize() {
-    // this.container.append(GameOver());
-    this.container.append(Intro({ nextView: this.nextView }));
-    // return this.setupView();
+  async initialize() {
+    await this.health.initialize();
+    // this.container.append(Intro({ nextView: this.nextView }));
+    this.nextView();
   }
 
   nextView = async () => {
@@ -52,15 +52,20 @@ export class View {
     const game = new currentGame(
       this.app,
       this.heart,
-      this.health.health,
+      this.health,
       this.nextView,
     );
-    console.log("CURRENT GAME", game);
-    await GameLevel({ game, onLose: this.gameOver });
+
+    const music = new Audio(
+      `src/assets/music/mus_f_6s_${this.currentLevel + 1}.ogg`,
+    );
+    music.loop = true;
+
+    await GameLevel({ game, onLose: this.gameOver, music });
 
     const currentSoul = CurrentSoul({ soulIndex: this.currentLevel });
-    this.container.append(currentSoul);
 
+    this.container.append(currentSoul);
     this.container.append(this.app.canvas);
     this.container.append(this.health.container);
   };
@@ -70,7 +75,7 @@ export class View {
     this.container.append(
       GameOver({
         onEnter: () => {
-          this.health.health.setHealthPoints(20);
+          this.health.setHealthPoints(20);
           this.container.innerHTML = "";
           this.currentLevel--;
           this.nextView();

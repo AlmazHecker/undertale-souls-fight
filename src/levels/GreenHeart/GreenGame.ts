@@ -22,7 +22,6 @@ export class GreenGame extends BaseGame {
     await this.panManager.initialize();
     this.startGameLoop();
 
-    this.emit("status", "STARTED");
     this.ticker.start();
     return this;
   }

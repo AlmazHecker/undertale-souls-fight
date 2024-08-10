@@ -47,29 +47,42 @@ export const easeOutIn = (t: number) => {
   return t < 0.5 ? 1 - 2 * (1 - t) * (1 - t) : 2 * (t - 0.5) * (t - 0.5);
 };
 
-export function cubicEaseInOut(t: number) {
+export const cubicEaseInOut = (t: number) => {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+};
 
-export const vibrate = async (
-  container: Text | Container,
-  duration: number,
-  центральныйУ?: number,
-  центральныйХ?: number,
-) => {
+export const easeOutCubic = (t: number) => {
+  return 1 - Math.pow(1 - t, 3);
+};
+
+export type VibrateOptions = {
+  container: Text | Container;
+  intensity?: number;
+  duration: number;
+  x?: number;
+  y?: number;
+};
+
+export const vibrate = async ({
+  container,
+  duration,
+  intensity = 20,
+  x,
+  y,
+}: VibrateOptions) => {
   await animateWithTimer(duration, () => {
-    if (центральныйУ) {
+    if (y) {
       const offsetY = getRandomInRange(-3, 3);
       container.y = Math.max(
-        центральныйУ - 20,
-        Math.min(центральныйУ + 20, container.y + offsetY),
+        y - intensity,
+        Math.min(y + intensity, container.y + offsetY),
       );
     }
-    if (центральныйХ) {
+    if (x) {
       const offsetX = getRandomInRange(-3, 3);
       container.x = Math.max(
-        центральныйХ - 20,
-        Math.min(центральныйХ + 20, container.x + offsetX),
+        x - intensity,
+        Math.min(x + intensity, container.x + offsetX),
       );
     }
   });

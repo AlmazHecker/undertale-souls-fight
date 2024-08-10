@@ -1,21 +1,18 @@
-import { Heart } from "../../../utils/items/Heart.ts";
+import { Heart } from "@/utils/items/Heart.ts";
 
 import * as PIXI from "pixi.js";
 import { Application, Assets, Sprite } from "pixi.js";
 import shoePng from "../assets/img/shoe.png";
 
-import actPng from "../../../assets/fight/act.png";
+import actPng from "@/assets/fight/act.png";
 
 import { Shoe } from "../assets/sprite/Shoe.ts";
-import { ActButton } from "../../../utils/items/ActButton.ts";
+import { ActButton } from "@/utils/items/ActButton.ts";
 import {
   arePolygonsColliding,
   createTicker,
-} from "../../../utils/helpers/pixi.helper.ts";
-import {
-  animateWithTimer,
-  lerp,
-} from "../../../utils/helpers/timing.helper.ts";
+} from "@/utils/helpers/pixi.helper.ts";
+import { animateWithTimer, lerp } from "@/utils/helpers/timing.helper.ts";
 
 export class ShoeManager {
   private spriteYMap = new Map<PIXI.Sprite, number>();
@@ -152,9 +149,10 @@ export class ShoeManager {
   public async helpUser() {
     if (this.actButton) this.actButton.disappear();
 
-    await animateWithTimer(1000, (progress) => {
+    const increaseShoeSpeed = (progress: number) => {
       this.shoeSpeed = lerp(this.shoeSpeed, 0, progress);
-    });
+    };
+    await animateWithTimer(1000, increaseShoeSpeed);
 
     // targetY - на сколько пикселец поднимутся элементы
     const targetY = 200;
@@ -171,9 +169,7 @@ export class ShoeManager {
   }
 
   destroy() {
-    this.app.stage.children.forEach((child) => {
-      if (child.label === "shoe") child.destroy();
-    });
+    this.app.stage.removeChild(...this.shoes);
     if (this.actButton) this.actButton.container.destroy();
   }
 }

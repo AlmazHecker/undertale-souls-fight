@@ -3,9 +3,9 @@ import { Sprite } from "pixi.js";
 import { ShoeManager } from "./helpers/ShoeManager.ts";
 import { StarManager } from "./helpers/StarManager.ts";
 
-import { Heart } from "../../utils/items/Heart.ts";
-import { BaseGame } from "../../utils/helpers/BaseGame.ts";
-import { Health } from "../../ui/Health/Health.ts";
+import { Heart } from "@/utils/items/Heart.ts";
+import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { Health } from "@/ui/Health/Health.ts";
 export class BlueGame extends BaseGame {
   private shoeManager: ShoeManager;
   private starManager: StarManager;
@@ -19,6 +19,7 @@ export class BlueGame extends BaseGame {
     super(app, heart, health, onFinish);
     this.shoeManager = new ShoeManager(app, heart);
     this.starManager = new StarManager(app, heart);
+    this.heart.maxHeightFromBottom = 60;
   }
 
   async initialize() {
@@ -26,7 +27,6 @@ export class BlueGame extends BaseGame {
     await this.starManager.initialize();
     this.startGameLoop();
 
-    this.emit("status", "STARTED");
     this.ticker.start();
     return this;
   }
@@ -74,6 +74,7 @@ export class BlueGame extends BaseGame {
 
   destroy(): Promise<void> | void {
     this.shoeManager.destroy();
+    this.starManager.destroy();
     this.ticker.stop();
     this.ticker.destroy();
   }

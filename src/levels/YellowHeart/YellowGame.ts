@@ -23,8 +23,6 @@ export class YellowGame extends BaseGame {
 
     this.startGameLoop();
 
-    this.emit("status", "STARTED");
-    this.on("status", this.statusListener);
     this.ticker.start();
     return this;
   }

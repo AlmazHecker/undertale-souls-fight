@@ -24,8 +24,6 @@ export class CyanGame extends BaseGame {
     this.app.stage.addChild(this.heart.container);
     this.startGameLoop();
 
-    this.emit("status", "STARTED");
-
     this.ticker.start();
     return this;
   }

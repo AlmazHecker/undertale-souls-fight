@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Application, Assets, Sprite } from "pixi.js";
 import knifePng from "../assets/img/knife.png";
-import actPng from "../../../assets/fight/act.png";
+import actPng from "@/assets/fight/act.png";
 
 import plasterPng from "../assets/img/plaster.png";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";

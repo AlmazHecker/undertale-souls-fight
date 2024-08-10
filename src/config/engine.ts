@@ -14,10 +14,6 @@ export const initializePixi = async ({
   let app: PIXI.Application | undefined = new PIXI.Application();
   let heart: Heart | undefined = undefined;
 
-  // const [, { stop }] = useSound(`src/assets/music/mus_f_6s_${musicIndex}.ogg`, {
-  //     soundEnabled: true,
-  // });
-
   const container = document.getElementById(GAME_CONTAINER);
 
   await app.init({

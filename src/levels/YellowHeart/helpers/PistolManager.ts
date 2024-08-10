@@ -17,6 +17,7 @@ import {
   callInfinitely,
   sleep,
   vibrate,
+  VibrateOptions,
 } from "@/utils/helpers/timing.helper.ts";
 import { Pistol } from "@/levels/YellowHeart/assets/sprite/Pistol.ts";
 import { PistolAim } from "@/levels/YellowHeart/assets/sprite/PistolAim.ts";
@@ -227,12 +228,13 @@ export class PistolManager {
   }
 
   public async helpUser() {
-    await vibrate(
-      this.pistol.container,
-      3000,
-      this.pistol.container.y,
-      this.pistol.container.x,
-    );
+    const options: VibrateOptions = {
+      container: this.pistol.container,
+      duration: 3000,
+      x: this.pistol.container.x,
+      y: this.pistol.container.y,
+    };
+    await vibrate(options);
     this.isHelping = true;
   }
 

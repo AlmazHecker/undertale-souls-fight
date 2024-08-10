@@ -23,12 +23,12 @@ import { ActButton } from "@/utils/items/ActButton.ts";
 export class PanManager {
   public actButton!: ActButton;
 
-  private pans: Pan[] = [];
   private fireTexture?: Texture;
   private actButtonTexture?: Texture;
   private eggTexture?: Texture;
   private isHelping: boolean = false;
 
+  private readonly pans: Pan[] = [];
   private readonly spacing = 50;
   private readonly panWidth = 190;
   private readonly panHeight = 30;

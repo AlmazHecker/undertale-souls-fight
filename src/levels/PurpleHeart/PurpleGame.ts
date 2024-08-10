@@ -30,7 +30,6 @@ export class PurpleGame extends BaseGame {
     await this.textManager.initialize();
     this.startGameLoop();
 
-    this.emit("status", "STARTED");
     this.ticker.start();
     return this;
   }

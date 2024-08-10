@@ -21,24 +21,15 @@ export class KeyboardHandler {
   }
 
   private onKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "ArrowUp":
-      case "ArrowDown":
-        this.keyState[event.key] = true;
+    if (event.key in this.keyState) {
+      this.keyState[event.key as keyof typeof this.keyState] = true;
     }
     if (this.keyDownMiddleware) this.keyDownMiddleware(event);
   }
 
   private onKeyUp(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "ArrowUp":
-      case "ArrowDown":
-        this.keyState[event.key] = false;
-        break;
+    if (event.key in this.keyState) {
+      this.keyState[event.key as keyof typeof this.keyState] = false;
     }
     if (this.keyupMiddleware) this.keyupMiddleware(event);
   }

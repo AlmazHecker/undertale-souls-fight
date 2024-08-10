@@ -53,6 +53,7 @@ export const areRectanglesColliding = (
 };
 
 //Для сравнения элементов со сложной формой(с полигонами)
+// TODO Оптимизировать эту функцию
 function isPointInPolygon(point: Point, polygon: Polygon) {
   let inside = false;
   const { x, y } = point;
