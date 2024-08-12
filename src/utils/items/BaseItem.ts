@@ -18,11 +18,6 @@ export class BaseItem<T extends Sprite | Graphics = Sprite> {
     }
   }
 
-  updatePosition(x: number, y: number) {
-    this.container.x = x;
-    this.container.y = y;
-  }
-
   toPolygon(path: number[]) {
     return new Polygon(path);
   }

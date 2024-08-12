@@ -60,7 +60,7 @@ export class YellowGame extends BaseGame {
 
   checkCollisions() {
     this.isBtnAndHeartColliding =
-      this.pistolManager.actButton?.isCollidingWithHeart(this.heart) as boolean;
+      this.pistolManager.actButton?.isCollidingWithHeart(this.heart);
     return this.pistolManager.checkCollisions();
   }
 

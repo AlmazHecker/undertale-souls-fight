@@ -6,7 +6,6 @@ import { StarManager } from "./helpers/StarManager.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { BaseGame } from "@/utils/helpers/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
-import { sleep } from "@/utils/helpers/timing.helper.ts";
 
 export class BlueGame extends BaseGame {
   private shoeManager: ShoeManager;
@@ -25,7 +24,6 @@ export class BlueGame extends BaseGame {
   }
 
   async preparingHelp() {
-    await sleep(2000);
     return this.shoeManager.preparingHelp();
   }
 
@@ -74,10 +72,11 @@ export class BlueGame extends BaseGame {
     this.isBtnAndHeartColliding =
       this.shoeManager.actButton?.isCollidingWithHeart(this.heart) as boolean;
 
-    let collisions: Sprite[] = [];
+    if (this.isBtnAndHeartColliding) return [];
+
+    const collisions: Sprite[] = [];
     collisions.push(...this.shoeManager.infiniteShoesLogic());
     collisions.push(...this.starManager.infiniteStarsLogic());
-    if (this.isBtnAndHeartColliding) collisions = [];
     return collisions;
   }
 

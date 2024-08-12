@@ -1,7 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Application, Assets, Sprite } from "pixi.js";
 import knifePng from "../assets/img/knife.png";
-import actPng from "@/assets/fight/act.png";
 
 import plasterPng from "../assets/img/plaster.png";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
@@ -12,7 +11,7 @@ import { Knife } from "@/levels/CyanHeart/assets/sprite/Knife.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class KnifeManager {
-  public actButton!: ActButton;
+  public actButton = new ActButton();
   private knifeSpacing = 10;
   private rotationSpeed = 0.025;
   private moveDuration = 3000;
@@ -28,6 +27,7 @@ export class KnifeManager {
   ) {}
 
   async initialize() {
+    await this.actButton.initialize();
     const knifeTexture = await Assets.load(knifePng);
 
     const numKnivesX = Math.ceil(
@@ -101,12 +101,9 @@ export class KnifeManager {
     };
 
     moveContainer();
-    // callInfinitely(moveContainer, !this.stopRhombusMovement);
   }
 
   public async createActButton() {
-    const actButtonTexture = await Assets.load(actPng);
-    this.actButton = new ActButton(actButtonTexture);
     this.knifeContainer.addChild(this.actButton.container);
     setTimeout(() => {
       this.replaceRandomKnifeWithActButton(this.actButton);
@@ -119,7 +116,7 @@ export class KnifeManager {
     //   Math.random() * this.knifeContainer.children.length,
     // );
     const knife = this.knifeContainer.children[10];
-    actButton.updatePosition(knife.x + 8 / 2, knife.y + 16 / 2);
+    actButton.container.position.set(knife.x + 8 / 2, knife.y + 16 / 2);
 
     actButton.container.visible = true;
     actButton.container.rotation = knife.rotation;
@@ -169,8 +166,6 @@ export class KnifeManager {
     this.app.stage.removeChild(this.knifeContainer);
     this.knifeContainer.destroy();
 
-    if (this.actButton) {
-      this.actButton.container.destroy();
-    }
+    this.actButton.container.destroy();
   }
 }

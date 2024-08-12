@@ -1,7 +1,6 @@
 import * as PIXI from "pixi.js";
-import { Application, Assets, Container, Sprite } from "pixi.js";
+import { Application, Container, Sprite } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
-import actPng from "@/assets/fight/act.png";
 import {
   areRectanglesColliding,
   createTicker,
@@ -20,7 +19,7 @@ import { Text } from "@/levels/PurpleHeart/assets/sprite/Text.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class TextManager {
-  public actButton!: ActButton;
+  public actButton = new ActButton();
   public texts: PIXI.Text[] = [];
   private textHeight = 50;
   private textSpacing = 0;
@@ -35,6 +34,7 @@ export class TextManager {
   ) {}
 
   async initialize() {
+    await this.actButton.initialize();
     const numTextsY = Math.ceil(
       this.app.renderer.height / (this.textHeight + 10),
     );
@@ -76,8 +76,6 @@ export class TextManager {
   }
 
   public async createActButton() {
-    const actButtonTexture = await Assets.load(actPng);
-    this.actButton = new ActButton(actButtonTexture);
     this.actButton.container.zIndex = 2;
     this.actButton.container.pivot = 0;
     this.actButton.container.height = this.textHeight;
@@ -90,7 +88,7 @@ export class TextManager {
   public replaceRandomTextWithActButton(actButton: ActButton) {
     const randomIndex = Math.floor(Math.random() * this.texts.length);
     const text = this.texts[randomIndex];
-    actButton.updatePosition(text.x, text.y);
+    actButton.container.position.set(text.x, text.y);
     actButton.container.visible = true;
     this.startHorizontalMovement(actButton.container);
     this.app.stage.removeChild(text);

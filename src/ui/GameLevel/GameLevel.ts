@@ -4,7 +4,6 @@ import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 
 import helpingSnd from "@/assets/music/snd_break.wav";
 import savedSnd from "@/assets/music/mus_f_saved.ogg";
-import { stopAudios } from "@/utils/helpers/audio.helper.ts";
 import { Sound } from "@/config/Sound.ts";
 
 type GameLevelArgs = {
@@ -19,9 +18,9 @@ const savedSound = new Sound(savedSnd);
 export const GameLevel = async ({ game, music, onLose }: GameLevelArgs) => {
   await Promise.all([
     game.initialize(),
-    music.play(),
     breakSound.load(),
     savedSound.load(),
+    music.play(),
   ]);
 
   const modal = new Modal("* You called for help...");
@@ -35,15 +34,14 @@ export const GameLevel = async ({ game, music, onLose }: GameLevelArgs) => {
   };
 
   const requestHelp = async () => {
-    if (["FINISH", "GAME_OVER"].includes(game.status)) {
-      return;
-    }
+    // Если чел проиграл - помощи не будет
+    if (["FINISH", "GAME_OVER"].includes(game.status)) return;
 
     game.emit("status", "PREPARING_HELP");
     await animateWithTimer(3000, async (progress) => {
       if (progress >= 1) {
-        stopAudios([music]);
-        return;
+        music.pause();
+        return music.remove();
       }
 
       music.preservesPitch = false;
@@ -56,7 +54,10 @@ export const GameLevel = async ({ game, music, onLose }: GameLevelArgs) => {
 
   const statusListener = (status: string) => {
     if (["FINISH", "GAME_OVER"].includes(status)) {
-      stopAudios([music, savedSound, breakSound]);
+      music.pause();
+      music.remove();
+      savedSound.stop();
+      breakSound.stop();
       game.destroy();
       game.health.off("health", healthListener);
       modal.hide();

@@ -4,8 +4,6 @@ import * as PIXI from "pixi.js";
 import { Application, Assets, Sprite } from "pixi.js";
 import shoePng from "../assets/img/shoe.png";
 
-import actPng from "@/assets/fight/act.png";
-
 import { Shoe } from "../assets/sprite/Shoe.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 import {
@@ -19,7 +17,7 @@ export class ShoeManager {
 
   private readonly app: Application;
   private readonly heart: Heart;
-  public actButton!: ActButton;
+  public actButton = new ActButton();
 
   public shoes: Sprite[] = [];
   private readonly defaultY: number;
@@ -41,6 +39,7 @@ export class ShoeManager {
   }
 
   async initialize() {
+    await this.actButton.initialize();
     const numShoesX =
       Math.floor(
         this.app.renderer.width / (this.shoeWidth + this.shoeSpacing),
@@ -107,8 +106,6 @@ export class ShoeManager {
   }
 
   private async createActButton() {
-    const actButtonTexture = await Assets.load(actPng);
-    this.actButton = new ActButton(actButtonTexture);
     this.actButton.container.rotation = Math.PI / 2;
 
     this.app.stage.addChild(this.actButton.container);
@@ -150,11 +147,11 @@ export class ShoeManager {
     const decreaseShoeSpeed = (progress: number) => {
       this.shoeSpeed = lerp(2.6, 0, progress);
     };
-    await animateWithTimer(1000, decreaseShoeSpeed);
+    await animateWithTimer(3000, decreaseShoeSpeed);
   }
 
   public async helpUser() {
-    if (this.actButton) this.actButton.disappear();
+    this.actButton.disappear();
 
     // targetY - на сколько пикселец поднимутся элементы
     const targetY = 150;
@@ -172,6 +169,6 @@ export class ShoeManager {
 
   destroy() {
     this.app.stage.removeChild(...this.shoes);
-    if (this.actButton) this.actButton.container.destroy();
+    this.actButton.container.destroy();
   }
 }

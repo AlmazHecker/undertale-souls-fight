@@ -7,11 +7,9 @@ export class Star extends BaseItem {
     super(sprite, x, y);
 
     this.container._zIndex = 2;
-    const centerX = sprite.width / 2;
-    const centerY = sprite.height / 2;
     this.container.label = "star";
 
-    this.container.pivot.set(centerX, centerY);
+    this.centerWithPivot();
     this.container.hitArea = this.toPolygon(svgPoints);
   }
 }

@@ -7,9 +7,9 @@ import { arePolygonsColliding } from "../helpers/pixi.helper.ts";
 import actPng from "@/assets/fight/act.png";
 
 export class ActButton extends BaseItem {
-  constructor(texture?: Texture) {
+  constructor(texture?: Texture, x = 0, y = 0) {
     const actButtonSprite = new Sprite(texture);
-    super(actButtonSprite, 0, 0, 140, 50);
+    super(actButtonSprite, x, y, 140, 50);
 
     this.container.tint = "#dc8a51";
     this.container.visible = false;

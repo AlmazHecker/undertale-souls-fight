@@ -4,7 +4,6 @@ import pistolPng from "@/levels/YellowHeart/assets/img/pistol.png";
 import bulletPng from "@/levels/YellowHeart/assets/img/bullet.png";
 
 import pistolAimPng from "@/levels/YellowHeart/assets/img/pistol-aim.png";
-import actButtonPng from "@/assets/fight/act.png";
 import heartAimPng from "@/levels/YellowHeart/assets/img/heart-aim.png";
 import flowerPng from "@/levels/YellowHeart/assets/img/flower.png";
 
@@ -25,16 +24,15 @@ import { Bullet } from "@/levels/YellowHeart/assets/sprite/Bullet.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class PistolManager {
-  public actButton!: ActButton;
+  public actButton = new ActButton();
 
+  private status: "IDLE" | "HELPING" | "DESTROY" = "IDLE";
   private pistol!: Pistol;
   private aimTexture!: Texture;
   private bulletTexture!: Texture;
-  private actButtonTexture!: Texture;
   private heartAimTexture!: Texture;
   private flowerTexture!: Texture;
   private bulletCount = 0;
-  private isHelping = false;
   private aimSleep = 250;
   private bulletSleep = 100;
 
@@ -44,12 +42,12 @@ export class PistolManager {
   ) {}
 
   async initialize() {
+    await this.actButton.initialize();
     const appCenterX = this.app.renderer.width / 2;
     const appCenterY = this.app.renderer.height / 2;
 
     this.aimTexture = await Assets.load(pistolAimPng);
     this.bulletTexture = await Assets.load(bulletPng);
-    this.actButtonTexture = await Assets.load(actButtonPng);
     this.heartAimTexture = await Assets.load(heartAimPng);
     this.flowerTexture = await Assets.load(flowerPng);
     const pistolTexture = await Assets.load(pistolPng);
@@ -62,7 +60,7 @@ export class PistolManager {
 
     this.app.stage.addChild(this.pistol.container);
 
-    callInfinitely(this.pistolAnimation.bind(this), true);
+    callInfinitely(this.pistolAnimation.bind(this), this.status !== "DESTROY");
   }
 
   public async pistolAnimation() {
@@ -91,7 +89,7 @@ export class PistolManager {
     let aimX = 0,
       aimY = 0;
 
-    if (this.isHelping) {
+    if (this.status === "HELPING") {
       const dx = heartX - pistolX;
       const dy = heartY - pistolY;
       const angle = Math.atan2(dy, dx);
@@ -184,19 +182,26 @@ export class PistolManager {
   }
 
   private createPistolAim() {
-    const texture = this.isHelping ? this.heartAimTexture : this.aimTexture;
-    const size = this.isHelping ? 45 : 60;
+    let texture = this.aimTexture;
+    let size = 60;
+    if (this.status === "HELPING") {
+      texture = this.heartAimTexture;
+      size = 45;
+    }
     return new PistolAim({ texture, width: size, height: size });
   }
 
   private createBullet(x: number, y: number) {
     if (this.bulletCount === 40) {
-      return this.createActButton(x, y);
+      this.actButton.container.visible = true;
+      this.actButton.container.position.set(x, y);
+      this.app.stage.addChild(this.actButton.container);
+      return this.actButton;
     }
 
-    const texture = this.isHelping ? this.flowerTexture : this.bulletTexture;
-    const bullet = new Bullet({ texture, x, y });
-    if (this.isHelping) {
+    const bullet = new Bullet({ texture: this.bulletTexture, x, y });
+    if (this.status === "HELPING") {
+      bullet.container.texture = this.flowerTexture;
       bullet.container.tint = "#07a108";
       bullet.container.width = 100;
       bullet.container.height = 40.82;
@@ -217,16 +222,6 @@ export class PistolManager {
     return collisions;
   }
 
-  private createActButton(x: number, y: number) {
-    this.actButton = new ActButton(this.actButtonTexture);
-    this.actButton.container.zIndex = 5;
-    this.actButton.container.visible = true;
-    this.actButton.container.x = x;
-    this.actButton.container.y = y;
-    this.app.stage.addChild(this.actButton.container);
-    return this.actButton;
-  }
-
   public preparingHelp() {
     const options: VibrateOptions = {
       container: this.pistol.container,
@@ -238,11 +233,12 @@ export class PistolManager {
   }
 
   public async helpUser() {
-    this.isHelping = true;
+    this.status = "HELPING";
     this.pistol.container.tint = "#07a108";
   }
 
   public destroy() {
+    this.status = "DESTROY";
     this.pistol.container.destroy();
     this.app.stage.removeChild(this.pistol.container);
   }

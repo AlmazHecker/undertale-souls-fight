@@ -13,7 +13,6 @@ import {
   getRandomBoolean,
   getRandomInRange,
 } from "@/utils/helpers/random.helper.ts";
-import actPng from "@/assets/fight/act.png";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Pan } from "@/levels/GreenHeart/assets/sprite/Pan.ts";
 import { Fire } from "@/levels/GreenHeart/assets/sprite/Fire.ts";
@@ -21,10 +20,9 @@ import { EGG_POLYGON } from "@/levels/GreenHeart/assets/sprite/Egg.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class PanManager {
-  public actButton!: ActButton;
+  public actButton = new ActButton();
 
   private fireTexture?: Texture;
-  private actButtonTexture?: Texture;
   private eggTexture?: Texture;
   private status: "IDLE" | "HELPING" | "DESTROY" = "IDLE";
 
@@ -44,8 +42,8 @@ export class PanManager {
   }
 
   async initialize() {
+    await this.actButton.initialize();
     this.fireTexture = await Assets.load(firePng);
-    this.actButtonTexture = await Assets.load(actPng);
     this.eggTexture = await Assets.load(eggPng);
     const panTexture = await Assets.load(panPng);
 
@@ -107,7 +105,6 @@ export class PanManager {
   public checkCollisions() {
     const collisions: Sprite[] = [];
     this.app.stage.children.forEach((sprite) => {
-      if (sprite?.label === "act-button") return;
       if (sprite.label === "fire" || sprite.label === "egg") {
         const isDamaged = arePolygonsColliding(sprite, this.heart.container);
         if (isDamaged) collisions.push(sprite as Sprite);
@@ -135,7 +132,7 @@ export class PanManager {
         count++;
 
         if (count % 80 === 0 && count !== 0 && this.status !== "HELPING") {
-          this.createActButton(this.actButtonTexture!, x, y);
+          this.createActButton(x, y);
           this.app.stage.addChild(this.actButton.container);
 
           return this.animateFireRiseAndFall(this.actButton);
@@ -158,14 +155,11 @@ export class PanManager {
     fire.hitArea = new Polygon(EGG_POLYGON);
   }
 
-  private createActButton(actButtonTexture: Texture, x: number, y: number) {
-    this.actButton = new ActButton(actButtonTexture);
-    this.actButton.container.zIndex = 5;
+  private createActButton(x: number, y: number) {
     this.actButton.container.pivot = 0;
     this.actButton.container.visible = true;
     this.actButton.container.rotation = Math.PI / 2;
-    this.actButton.container.x = x;
-    this.actButton.container.y = y;
+    this.actButton.container.position.set(x, y);
   }
 
   animatePanRotation(pan: Pan) {
@@ -177,8 +171,7 @@ export class PanManager {
     let wiggleDirection = 20;
     const animate = async () => {
       await animateWithTimer(wiggleDuration, (progress) => {
-        const currentWiggle = startX + wiggleDirection * progress;
-        pan.container.x = currentWiggle;
+        pan.container.x = startX + wiggleDirection * progress;
         const lift = Math.sin(progress * Math.PI) * 5; // Slight lift to mimic real movement
         pan.container.y = startY - lift;
       });
@@ -186,16 +179,14 @@ export class PanManager {
       pan.container.x = startX + wiggleDirection;
 
       await animateWithTimer(rotationDuration, (progress) => {
-        const angle = progress * (Math.PI / 9); // 20 degrees
-        pan.container.rotation = angle;
+        pan.container.rotation = progress * (Math.PI / 9);
       });
       await animateWithTimer(rotationDuration, (progress) => {
-        const angle = (1 - progress) * (Math.PI / 9);
-        pan.container.rotation = angle;
+        pan.container.rotation = (1 - progress) * (Math.PI / 9);
       });
       wiggleDirection = wiggleDirection === -20 ? 20 : -20;
     };
-    callInfinitely(animate, true);
+    callInfinitely(animate, this.status !== "DESTROY");
   }
 
   public async helpUser() {
@@ -216,6 +207,6 @@ export class PanManager {
         if (sprite.label === "fire" || sprite.label === "egg") sprite.destroy();
       });
     });
-    if (this.actButton) this.actButton.container.destroy();
+    this.actButton.container.destroy();
   }
 }
