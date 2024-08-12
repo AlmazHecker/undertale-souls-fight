@@ -45,6 +45,10 @@ export class YellowGame extends BaseGame {
     });
   }
 
+  preparingHelp() {
+    return this.pistolManager.preparingHelp();
+  }
+
   async helpUser() {
     await this.pistolManager.helpUser();
 

@@ -26,6 +26,7 @@ export class TextManager {
   private textSpacing = 0;
   private moveSpeed = 2;
   private activeWords: string[] = BAD_WORDS;
+  private yAxis: number[] = [];
   private stop: boolean = false;
 
   constructor(
@@ -44,6 +45,8 @@ export class TextManager {
         0,
         y * (this.textHeight + this.textSpacing),
       );
+
+      this.yAxis.push(text.text.y);
 
       text.text.style.fontSize = 45;
       text.text.height = this.textHeight;
@@ -127,24 +130,21 @@ export class TextManager {
     moveTicker.start();
   }
 
+  public async preparingHelp() {
+    this.texts.map((text) => {
+      const originalY = text.y;
+      return vibrate({ container: text, duration: 3000, y: originalY });
+    });
+  }
+
   public async helpUser() {
     this.activeWords = GOOD_WORDS;
     this.actButton.disappear();
 
-    const positions: { y: number }[] = [];
-    await Promise.all(
-      this.texts.map((text) => {
-        const originalY = text.y;
-        positions.push({ y: originalY });
-
-        return vibrate({ container: text, duration: 2000, y: originalY });
-      }),
-    );
-
     this.texts.forEach((text, index) => {
       text.tint = "#07a108";
       text.text = GOOD_WORDS[getRandomIndex(GOOD_WORDS)];
-      text.y = positions[index].y;
+      text.y = this.yAxis[index];
     });
   }
 

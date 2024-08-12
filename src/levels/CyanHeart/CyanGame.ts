@@ -64,4 +64,6 @@ export class CyanGame extends BaseGame {
     this.ticker.stop();
     this.ticker.destroy();
   }
+
+  preparingHelp() {}
 }

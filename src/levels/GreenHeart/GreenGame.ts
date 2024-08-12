@@ -14,6 +14,7 @@ export class GreenGame extends BaseGame {
     health: Health,
     onFinish: () => void,
   ) {
+    heart.maxHeightFromBottom = 300;
     super(app, heart, health, onFinish);
     this.panManager = new PanManager(app, heart);
   }
@@ -61,8 +62,10 @@ export class GreenGame extends BaseGame {
   }
 
   destroy(): Promise<void> | void {
-    this.destroy();
+    this.panManager.destroy();
     this.ticker.stop();
     this.ticker.destroy();
   }
+
+  preparingHelp() {}
 }

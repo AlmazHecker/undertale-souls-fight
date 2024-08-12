@@ -1,9 +1,15 @@
+import { Sound } from "@/config/Sound.ts";
+
 export const stopAudios = (
-  audios: HTMLAudioElement[],
+  audios: (HTMLAudioElement | Sound)[],
   remove: boolean = true,
 ) => {
   audios.forEach((audio) => {
-    audio.pause();
-    if (remove) audio.remove();
+    if (audio instanceof Sound) {
+      audio.stop();
+    } else {
+      audio.pause();
+      if (remove) audio.remove();
+    }
   });
 };

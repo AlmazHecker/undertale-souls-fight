@@ -22,7 +22,7 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 1;
+  private currentLevel = 5;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,
@@ -31,8 +31,8 @@ export class View {
 
   async initialize() {
     await this.health.initialize();
-    // this.container.append(Intro({ nextView: this.nextView }));
-    this.nextView();
+    this.container.append(Intro({ nextView: this.nextView }));
+    // this.nextView();
   }
 
   nextView = async () => {

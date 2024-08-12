@@ -1,12 +1,13 @@
-import { Sprite, Texture } from "pixi.js";
+import { Assets, Sprite, Texture } from "pixi.js";
 
 import { BaseItem } from "./BaseItem.ts";
 import { Heart } from "./Heart.ts";
 import { animateWithTimer } from "../helpers/timing.helper.ts";
 import { arePolygonsColliding } from "../helpers/pixi.helper.ts";
+import actPng from "@/assets/fight/act.png";
 
 export class ActButton extends BaseItem {
-  constructor(texture: Texture) {
+  constructor(texture?: Texture) {
     const actButtonSprite = new Sprite(texture);
     super(actButtonSprite, 0, 0, 140, 50);
 
@@ -16,6 +17,11 @@ export class ActButton extends BaseItem {
     this.container._zIndex = 5;
     this.container.hitArea = this.toPolygon(svgPolygon);
     this.container.label = "act-button";
+  }
+
+  public async initialize() {
+    const actButtonTexture = await Assets.load(actPng);
+    this.container.texture = actButtonTexture;
   }
 
   public isCollidingWithHeart(heart: Heart) {

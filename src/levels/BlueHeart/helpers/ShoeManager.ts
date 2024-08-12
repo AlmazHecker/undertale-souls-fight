@@ -146,16 +146,18 @@ export class ShoeManager {
     return moveTicker;
   }
 
+  public async preparingHelp() {
+    const decreaseShoeSpeed = (progress: number) => {
+      this.shoeSpeed = lerp(2.6, 0, progress);
+    };
+    await animateWithTimer(1000, decreaseShoeSpeed);
+  }
+
   public async helpUser() {
     if (this.actButton) this.actButton.disappear();
 
-    const increaseShoeSpeed = (progress: number) => {
-      this.shoeSpeed = lerp(this.shoeSpeed, 0, progress);
-    };
-    await animateWithTimer(1000, increaseShoeSpeed);
-
     // targetY - на сколько пикселец поднимутся элементы
-    const targetY = 200;
+    const targetY = 150;
     // Начальная позиция по y оси = используется чтобы равномерно передвигались вверх
     const initialYPositions: { [index: number]: number } = {};
     this.shoes.forEach((shoe, index) => {

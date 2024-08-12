@@ -23,7 +23,6 @@ export class NoteManager {
 
     for (let y = 0; y <= numNotesY; y++) {
       const note = new Note(noteTexture, 0, y * this.noteHeight);
-      note.container.label = "note";
       this.leftNotes.push(note.container);
       this.app.stage.addChild(note.container);
     }
@@ -31,7 +30,6 @@ export class NoteManager {
     for (let y = 0; y <= numNotesY; y++) {
       const note = new Note(noteTexture, canvasWidth, y * this.noteHeight);
       note.container.rotation = Math.PI;
-      note.container.label = "note";
       this.rightNotes.push(note.container);
       this.app.stage.addChild(note.container);
     }
@@ -76,8 +74,9 @@ export class NoteManager {
   public async helpUser() {}
 
   public destroy() {
+    this.leftNotes.forEach((sprite) => sprite.destroy());
+    this.rightNotes.forEach((sprite) => sprite.destroy());
     this.leftNotes = [];
     this.rightNotes = [];
-    this.app.stage.removeChild(...this.leftNotes, ...this.rightNotes);
   }
 }

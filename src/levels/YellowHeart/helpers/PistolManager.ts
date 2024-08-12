@@ -227,15 +227,19 @@ export class PistolManager {
     return this.actButton;
   }
 
-  public async helpUser() {
+  public preparingHelp() {
     const options: VibrateOptions = {
       container: this.pistol.container,
       duration: 3000,
       x: this.pistol.container.x,
       y: this.pistol.container.y,
     };
-    await vibrate(options);
+    return vibrate(options);
+  }
+
+  public async helpUser() {
     this.isHelping = true;
+    this.pistol.container.tint = "#07a108";
   }
 
   public destroy() {

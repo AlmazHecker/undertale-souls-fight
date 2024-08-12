@@ -8,5 +8,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!container) return alert("NUH-UH!");
 
   const { app, heart } = await initializePixi({});
-  return new View(container, app, heart).initialize();
+
+  const btn = document.createElement("button");
+  btn.addEventListener("click", () => {
+    btn.remove();
+    return new View(container, app, heart).initialize();
+  });
+  btn.innerText = "content";
+  document.body.append(btn);
 });

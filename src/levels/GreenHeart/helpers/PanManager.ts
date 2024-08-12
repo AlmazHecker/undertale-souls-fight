@@ -1,5 +1,5 @@
 import { Heart } from "@/utils/items/Heart.tsx";
-import { Application, Assets, Sprite, Texture } from "pixi.js";
+import { Application, Assets, Polygon, Sprite, Texture } from "pixi.js";
 import panPng from "@/levels/GreenHeart/assets/img/pan.png";
 import firePng from "@/levels/GreenHeart/assets/img/fire.png";
 import eggPng from "@/levels/GreenHeart/assets/img/egg.png";
@@ -17,7 +17,7 @@ import actPng from "@/assets/fight/act.png";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Pan } from "@/levels/GreenHeart/assets/sprite/Pan.ts";
 import { Fire } from "@/levels/GreenHeart/assets/sprite/Fire.ts";
-import { Egg } from "@/levels/GreenHeart/assets/sprite/Egg.ts";
+import { EGG_POLYGON } from "@/levels/GreenHeart/assets/sprite/Egg.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class PanManager {
@@ -26,7 +26,7 @@ export class PanManager {
   private fireTexture?: Texture;
   private actButtonTexture?: Texture;
   private eggTexture?: Texture;
-  private isHelping: boolean = false;
+  private status: "IDLE" | "HELPING" | "DESTROY" = "IDLE";
 
   private readonly pans: Pan[] = [];
   private readonly spacing = 50;
@@ -87,22 +87,16 @@ export class PanManager {
       ? this.horizontalFireMovement
       : -this.horizontalFireMovement;
     await animateWithTimer(300, (progress, destroy) => {
-      if (this.isHelping && fire.container.label === "fire") {
-        destroy();
-      } else {
-        fire.container.y = startY - this.riseDistance * progress;
-      }
+      if (this.status === "DESTROY") return destroy();
+      fire.container.y = startY - this.riseDistance * progress;
     });
 
     await animateWithTimer(3000, (progress, destroy) => {
-      if (this.isHelping && fire.container.label === "fire") {
-        destroy();
-      } else {
-        fire.container.x = startX + horizontalOffset * progress;
-        const gravityEffect = Math.pow(progress, 2); // Simulate gravity
-        fire.container.y =
-          startY - this.riseDistance + this.fallDistance * gravityEffect;
-      }
+      if (this.status === "DESTROY") return destroy();
+      fire.container.x = startX + horizontalOffset * progress;
+      const gravityEffect = Math.pow(progress, 2); // Simulate gravity
+      fire.container.y =
+        startY - this.riseDistance + this.fallDistance * gravityEffect;
       if (fire.container.label !== "act-button") {
         fire.container.alpha = 1 - progress;
       }
@@ -127,44 +121,41 @@ export class PanManager {
     let count = 0;
 
     this.pans.forEach((pan) => {
+      if (this.status === "DESTROY") return;
+
       const y = pan.container.y;
 
       const randomInterval = getRandomInRange(300, 700);
 
       setInterval(() => {
+        if (this.status === "DESTROY") return;
         const baseX = pan.container.x - (pan.container.width / 2 + 20);
         const randomOffset = getRandomBoolean() ? -20 : 0;
         const x = baseX + randomOffset;
         count++;
 
-        if (this.isHelping) {
-          const egg = new Egg({
-            texture: this.eggTexture!,
-            x,
-            y,
-          });
-          egg.container.tint = "#07a108";
-
-          this.app.stage.addChild(egg.container);
-          return this.animateFireRiseAndFall(egg);
-        }
-        if (count % 80 === 0 && count !== 0) {
+        if (count % 80 === 0 && count !== 0 && this.status !== "HELPING") {
           this.createActButton(this.actButtonTexture!, x, y);
           this.app.stage.addChild(this.actButton.container);
 
           return this.animateFireRiseAndFall(this.actButton);
         }
-
-        const fire = new Fire({
-          texture: this.fireTexture!,
-          x,
-          y,
-        });
+        const fire = new Fire({ texture: this.fireTexture!, x, y });
+        if (this.status === "HELPING") this.replaceFireWithEgg(fire.container);
 
         this.app.stage.addChild(fire.container);
         this.animateFireRiseAndFall(fire);
       }, randomInterval);
     });
+  }
+
+  public replaceFireWithEgg(fire: Sprite) {
+    fire.texture = this.eggTexture!;
+    fire.label = "egg";
+    fire.tint = "#07a108";
+    fire.width = 80;
+    fire.height = 54;
+    fire.hitArea = new Polygon(EGG_POLYGON);
   }
 
   private createActButton(actButtonTexture: Texture, x: number, y: number) {
@@ -208,16 +199,23 @@ export class PanManager {
   }
 
   public async helpUser() {
-    this.isHelping = true;
+    this.status = "HELPING";
+    this.app.stage.children.forEach((sprite) => {
+      if (sprite.label === "fire") {
+        this.replaceFireWithEgg(sprite as Sprite);
+      }
+    });
   }
 
   destroy() {
+    this.status = "DESTROY";
     this.pans.forEach((pan) => {
       pan.container.destroy();
       this.app.stage.removeChild(pan.container);
+      this.app.stage.children.forEach((sprite) => {
+        if (sprite.label === "fire" || sprite.label === "egg") sprite.destroy();
+      });
     });
-    this.fireTexture?.destroy();
-    this.eggTexture?.destroy();
     if (this.actButton) this.actButton.container.destroy();
   }
 }

@@ -6,6 +6,8 @@ import { StarManager } from "./helpers/StarManager.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { BaseGame } from "@/utils/helpers/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
+import { sleep } from "@/utils/helpers/timing.helper.ts";
+
 export class BlueGame extends BaseGame {
   private shoeManager: ShoeManager;
   private starManager: StarManager;
@@ -20,6 +22,11 @@ export class BlueGame extends BaseGame {
     this.shoeManager = new ShoeManager(app, heart);
     this.starManager = new StarManager(app, heart);
     this.heart.maxHeightFromBottom = 60;
+  }
+
+  async preparingHelp() {
+    await sleep(2000);
+    return this.shoeManager.preparingHelp();
   }
 
   async initialize() {
@@ -51,8 +58,10 @@ export class BlueGame extends BaseGame {
 
   async helpUser() {
     this.shoeManager.verticalMoveDisabled = true;
-    await this.shoeManager.helpUser();
-    await this.starManager.helpUser();
+    await Promise.all([
+      this.shoeManager.helpUser(),
+      this.starManager.helpUser(),
+    ]);
 
     setTimeout(() => {
       this.emit("status", "FINISH");

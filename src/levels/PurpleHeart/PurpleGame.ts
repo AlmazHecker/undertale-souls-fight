@@ -19,6 +19,7 @@ export class PurpleGame extends BaseGame {
     onFinish: () => void,
   ) {
     super(app, heart, health, onFinish);
+    heart.maxHeightFromBottom = 0;
     this.noteManager = new NoteManager(app, heart);
     this.textManager = new TextManager(app, heart);
 
@@ -54,6 +55,10 @@ export class PurpleGame extends BaseGame {
       this.health.setHealthPoints(2);
       this.textManager.removeText(collision);
     });
+  }
+
+  preparingHelp() {
+    return this.textManager.preparingHelp();
   }
 
   async helpUser() {

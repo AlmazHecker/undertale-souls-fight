@@ -47,11 +47,7 @@ export class OrangeGame extends BaseGame {
   handleHeal(collisions: Sprite[]) {
     collisions.forEach((collision) => {
       this.health.incrementHealth();
-
-      // little optimization
-      this.gloveManager.gloveContainers[+collision.label]?.removeChild(
-        collision,
-      );
+      collision.visible = false;
     });
   }
 
@@ -70,4 +66,6 @@ export class OrangeGame extends BaseGame {
     this.ticker.stop();
     this.ticker.destroy();
   }
+
+  preparingHelp() {}
 }

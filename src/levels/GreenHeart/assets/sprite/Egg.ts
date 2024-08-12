@@ -1,20 +1,4 @@
-import * as PIXI from "pixi.js";
-import { ItemOptions } from "@/utils/types.ts";
-import { BaseItem } from "@/utils/items/BaseItem.ts";
-
-export class Egg extends BaseItem {
-  constructor(options: ItemOptions) {
-    const sprite = new PIXI.Sprite(options.texture);
-    super(sprite, options.x, options.y, 80, 54);
-    this.container._zIndex = 2;
-    this.centerWithPivot();
-    this.container.label = "egg";
-
-    this.container.hitArea = this.toPolygon(svgPoints);
-  }
-}
-
-const svgPoints = [
+export const EGG_POLYGON = [
   17.5, 1.5, 19.150358200073242, 1.232946753501892, 20.815874099731445,
   1.0888745784759521, 22.487499237060547, 1.0831884145736694,
   24.152572631835938, 1.2299617528915405, 25.794965744018555,

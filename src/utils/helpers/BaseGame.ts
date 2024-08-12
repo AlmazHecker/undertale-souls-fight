@@ -10,6 +10,7 @@ interface GameEvents {
 
 export type GameLifeCycle =
   | "IDLE"
+  | "PREPARING_HELP"
   | "HELP_REQUESTED"
   | "HELPING"
   | "FINISH"
@@ -44,16 +45,18 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
 
   abstract destroy(): Promise<void> | void;
 
-  private statusListener(status: GameLifeCycle) {
+  abstract preparingHelp(): void;
+
+  statusListener(status: GameLifeCycle) {
+    // throttling типа
     if (status === this.status) return;
 
+    if (status === "PREPARING_HELP" && this.preparingHelp) {
+      this.preparingHelp();
+    }
+
     if (status === "HELP_REQUESTED") {
-      // setTimeout(
-      //   () => {
       this.helpUser().then(() => this.emit("status", "HELPING"));
-      // },
-      //   Math.random() * 2000 + 1000,
-      // );
     }
 
     this.status = status;
