@@ -9,11 +9,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const { app, heart } = await initializePixi({});
 
-  const btn = document.createElement("button");
-  btn.addEventListener("click", () => {
-    btn.remove();
-    return new View(container, app, heart).initialize();
-  });
-  btn.innerText = "content";
-  document.body.append(btn);
+  return new View(container, app, heart).initialize();
 });

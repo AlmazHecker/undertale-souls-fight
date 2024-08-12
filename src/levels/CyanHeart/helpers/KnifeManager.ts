@@ -8,7 +8,7 @@ import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { shuffleArray } from "@/utils/helpers/random.helper.ts";
 import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 import { Heart } from "@/utils/items/Heart.ts";
-import { Knife } from "@/utils/items/Knife.ts";
+import { Knife } from "@/levels/CyanHeart/assets/sprite/Knife.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class KnifeManager {
