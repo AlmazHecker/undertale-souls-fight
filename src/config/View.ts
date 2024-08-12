@@ -11,6 +11,13 @@ import { GreenGame } from "@/levels/GreenHeart/GreenGame.ts";
 import { YellowGame } from "@/levels/YellowHeart/YellowGame.ts";
 import { CurrentSoul } from "@/ui/CurrentHeart/CurrentHeart.ts";
 import { GameOver } from "@/ui/GameOver/GameOver.ts";
+import snd1 from "@/assets/music/mus_f_6s_1.ogg";
+import snd2 from "@/assets/music/mus_f_6s_2.ogg";
+import snd3 from "@/assets/music/mus_f_6s_3.ogg";
+import snd4 from "@/assets/music/mus_f_6s_4.ogg";
+import snd5 from "@/assets/music/mus_f_6s_5.ogg";
+import snd6 from "@/assets/music/mus_f_6s_6.ogg";
+const audios = [snd1, snd2, snd3, snd4, snd5, snd6];
 
 export class View {
   private readonly health = new Health();
@@ -56,9 +63,7 @@ export class View {
       this.nextView,
     );
 
-    const music = new Audio(
-      `src/assets/music/mus_f_6s_${this.currentLevel + 1}.ogg`,
-    );
+    const music = new Audio(audios[this.currentLevel]);
     music.loop = true;
 
     await GameLevel({ game, onLose: this.gameOver, music });

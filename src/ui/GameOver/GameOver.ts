@@ -1,4 +1,4 @@
-import gameOverVideo from "@/assets/video/game_over.mp4";
+import gameOverVideo from "@/assets/video/game_over.webm";
 import css from "./GameOver.module.css";
 import { TypingEffect } from "@/ui/TypingEffect/TypingEffect.ts";
 import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
