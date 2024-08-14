@@ -39,7 +39,6 @@ export class View {
   async initialize() {
     await this.health.initialize();
     this.container.append(Intro({ nextView: this.nextView }));
-    // this.nextView();
   }
 
   nextView = async () => {
@@ -70,16 +69,14 @@ export class View {
 
     const currentSoul = CurrentSoul({ soulIndex: this.currentLevel });
 
-    this.container.append(currentSoul);
-    this.container.append(this.app.canvas);
-    this.container.append(this.health.container);
+    this.container.append(currentSoul, this.app.canvas, this.health.container);
   };
 
   gameOver = () => {
     this.container.innerHTML = "";
     this.container.append(
       GameOver({
-        onEnter: () => {
+        onExit: () => {
           this.health.setHealthPoints(20);
           this.container.innerHTML = "";
           this.currentLevel--;

@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { BaseItem } from "@/utils/items/BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Knife extends BaseItem {
   constructor(texture: PIXI.Texture, x: number, y: number) {

@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.ts";
 import { Health } from "@/ui/Health/Health.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 import { GloveManager } from "./helpers/GloveManager.ts";
 
 export class OrangeGame extends BaseGame {

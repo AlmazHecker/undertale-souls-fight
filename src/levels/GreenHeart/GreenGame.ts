@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
 import { PanManager } from "@/levels/GreenHeart/helpers/PanManager.ts";
 import { Health } from "@/ui/Health/Health.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 
 export class GreenGame extends BaseGame {

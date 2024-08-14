@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Graphics, Ticker } from "pixi.js";
 
-import { BaseItem } from "./BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 import { KeyboardHandler } from "../helpers/mover.helper.ts";
 import { createTicker } from "../helpers/pixi.helper.ts";
 
@@ -13,11 +13,11 @@ const svgPath = [
 ];
 
 export class Heart extends BaseItem<Graphics & { vx: number; vy: number }> {
-  private app: PIXI.Application;
-  public polygon: PIXI.Polygon;
   public maxHeightFromBottom: number = 0;
   public keyboardHandler: KeyboardHandler;
 
+  private app: PIXI.Application;
+  private ticker: Ticker = createTicker();
   private blinkInterval: ReturnType<typeof setInterval> | undefined; // Blink interval
 
   constructor(app: PIXI.Application, maxHeightFromBottom: number = 0) {
@@ -32,7 +32,6 @@ export class Heart extends BaseItem<Graphics & { vx: number; vy: number }> {
     this.app = app;
 
     this.container.fill("red");
-    this.polygon = heartPolygon;
     this.container.height = 25;
     this.container.width = 25;
     this.container._zIndex = 10;
@@ -82,19 +81,17 @@ export class Heart extends BaseItem<Graphics & { vx: number; vy: number }> {
   public startBlinking() {
     let isRed = true;
     this.blinkInterval = setInterval(() => {
-      this.container.clear().poly(this.polygon.points || []);
+      this.container.clear().poly(this.toPolygon(svgPath).points || []);
       this.container.fill(isRed ? "red" : "transparent");
       isRed = !isRed;
     }, 100);
 
     setTimeout(() => {
       clearInterval(this.blinkInterval);
-      this.container.clear().poly(this.polygon.points || []);
+      this.container.clear().poly(this.toPolygon(svgPath).points || []);
       this.container.fill("red");
     }, 1000);
   }
-
-  private ticker: Ticker = createTicker();
 
   setup() {
     this.ticker.add((delta) => {

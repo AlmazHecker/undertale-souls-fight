@@ -18,7 +18,7 @@ export class BaseItem<T extends Sprite | Graphics = Sprite> {
     }
   }
 
-  toPolygon(path: number[]) {
+  public toPolygon(path: number[]) {
     return new Polygon(path);
   }
 

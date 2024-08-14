@@ -1,6 +1,6 @@
 import { SOULS } from "@/utils/constants.ts";
 import css from "./CurrentHeart.module.css";
-import tvScreenSrc from "@/assets/fight/tv-screen.png";
+import tvScreenSrc from "@/ui/CurrentHeart/tv-screen.png";
 
 type CurrentSoulArgs = {
   soulIndex: number;
@@ -26,8 +26,7 @@ export const CurrentSoul = ({ soulIndex }: CurrentSoulArgs) => {
   `;
 
   heartSvg = heartSvg.firstElementChild as HTMLElement;
-  imageWrapper.appendChild(tvScreen);
-  imageWrapper.appendChild(heartSvg);
+  imageWrapper.append(tvScreen, heartSvg);
 
   return imageWrapper;
 };

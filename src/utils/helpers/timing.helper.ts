@@ -36,24 +36,19 @@ export const animateWithTimer = (
   });
 };
 
-export const lerp = (start: number, end: number, t: number) => {
-  return start * (1 - t) + end * t;
-};
+export const lerp = (start: number, end: number, t: number) =>
+  start * (1 - t) + end * t;
 
 export const easeInOut = (t: number) =>
   t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-export const easeOutIn = (t: number) => {
-  return t < 0.5 ? 1 - 2 * (1 - t) * (1 - t) : 2 * (t - 0.5) * (t - 0.5);
-};
+export const easeOutIn = (t: number) =>
+  t < 0.5 ? 1 - 2 * (1 - t) * (1 - t) : 2 * (t - 0.5) * (t - 0.5);
 
-export const cubicEaseInOut = (t: number) => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-};
+export const cubicEaseInOut = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-export const easeOutCubic = (t: number) => {
-  return 1 - Math.pow(1 - t, 3);
-};
+export const easeOutCubic = (t: number) => -Math.pow(1 - t, 3);
 
 export type VibrateOptions = {
   container: Text | Container;

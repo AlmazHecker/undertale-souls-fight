@@ -5,9 +5,9 @@ import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
 import gameOverSnd from "@/assets/music/mus_gameover.ogg";
 
 type GameOverProps = {
-  onEnter: () => void;
+  onExit: () => void;
 };
-export const GameOver = ({ onEnter }: GameOverProps) => {
+export const GameOver = ({ onExit }: GameOverProps) => {
   const gameOverSound = new Audio(gameOverSnd);
   gameOverSound.loop = true;
   gameOverSound.autoplay;
@@ -52,7 +52,7 @@ export const GameOver = ({ onEnter }: GameOverProps) => {
   const destroy = () => {
     gameOverSound.pause();
     gameOverSound.remove();
-    onEnter();
+    onExit();
   };
 
   const video = document.createElement("video");

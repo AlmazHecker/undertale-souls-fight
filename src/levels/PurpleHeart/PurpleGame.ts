@@ -4,7 +4,7 @@ import { Heart } from "@/utils/items/Heart.tsx";
 import { NoteManager } from "@/levels/PurpleHeart/helpers/NoteManager.ts";
 import { TextManager } from "@/levels/PurpleHeart/helpers/TextManager.ts";
 import { Health } from "@/ui/Health/Health.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 
 export class PurpleGame extends BaseGame {
   private noteManager: NoteManager;

@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { BaseItem } from "@/utils/items/BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 import { ItemOptions } from "@/utils/types.ts";
 
 export class Bullet extends BaseItem {

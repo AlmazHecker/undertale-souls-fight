@@ -4,7 +4,7 @@ import { ShoeManager } from "./helpers/ShoeManager.ts";
 import { StarManager } from "./helpers/StarManager.ts";
 
 import { Heart } from "@/utils/items/Heart.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
 
 export class BlueGame extends BaseGame {

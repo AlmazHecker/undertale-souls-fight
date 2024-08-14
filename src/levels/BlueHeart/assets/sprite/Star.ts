@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { BaseItem } from "@/utils/items/BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Star extends BaseItem {
   constructor(x = 0, y = 0, texture: PIXI.Texture) {

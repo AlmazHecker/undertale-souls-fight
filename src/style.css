@@ -1,17 +1,16 @@
 @font-face {
   font-family: Determination;
-  src: url(assets/fonts/determination-extended.ttf) format('truetype');
+  src: url(assets/fonts/determination-extended.ttf) format("truetype");
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
+#game-container {
+  width: 800px;
+  height: 500px;
+
   text-align: center;
-
-
-  font-family: Determination, sans-serif;
   font-weight: 400;
-
+  font-family: Determination, sans-serif;
+  margin: 0 auto;
 }
 
 :root {
@@ -41,18 +40,17 @@
   }
 }
 
-
-
 * {
   box-sizing: border-box;
 }
 
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
 
+  display: grid;
+  place-items: center;
+  place-content: center;
+
+  width: 100vw;
+  height: 100vh;
+}

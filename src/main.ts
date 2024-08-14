@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById(GAME_CONTAINER);
   if (!container) return alert("NUH-UH!");
 
-  const { app, heart } = await initializePixi({});
+  const { app, heart } = await initializePixi();
 
   return new View(container, app, heart).initialize();
 });

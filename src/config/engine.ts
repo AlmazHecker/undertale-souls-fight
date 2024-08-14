@@ -3,24 +3,13 @@ import * as PIXI from "pixi.js";
 
 export const GAME_CONTAINER = "game-container";
 
-type Args = {
-  // musicIndex: number;
-  maxHeightFromBottom?: number;
-};
-export const initializePixi = async ({
-  // musicIndex,
-  maxHeightFromBottom,
-}: Args) => {
+export const initializePixi = async () => {
   let app: PIXI.Application | undefined = new PIXI.Application();
   let heart: Heart | undefined = undefined;
 
-  const container = document.getElementById(GAME_CONTAINER);
+  const container = document.getElementById(GAME_CONTAINER) || undefined;
 
-  await app.init({
-    width: 800,
-    height: 500,
-    resizeTo: container || undefined,
-  });
+  await app.init({ width: 800, height: 500, resizeTo: container });
 
   if (import.meta.env.MODE === "development") {
     const winda = window as unknown as Record<string, unknown>;
@@ -31,7 +20,7 @@ export const initializePixi = async ({
   app.ticker.minFPS = 60;
   app.ticker.maxFPS = 60;
 
-  heart = new Heart(app, maxHeightFromBottom);
+  heart = new Heart(app);
   heart.setup();
   app.stage.addChild(heart.container);
 

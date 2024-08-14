@@ -3,7 +3,7 @@ import { Sprite } from "pixi.js";
 
 import { Heart } from "@/utils/items/Heart.ts";
 import { KnifeManager } from "./helpers/KnifeManager.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
 
 export class CyanGame extends BaseGame {

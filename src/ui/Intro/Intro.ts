@@ -62,6 +62,7 @@ type IntroProps = {
 const Intro = ({ nextView }: IntroProps) => {
   const hearts = SoulHearts();
   const button = Button({ text: "START GAME" });
+  button.style.margin = "0 auto";
   button.onclick = async () => {
     button.disabled = true;
 
@@ -73,8 +74,7 @@ const Intro = ({ nextView }: IntroProps) => {
   };
 
   const container = document.createElement("div");
-  container.append(hearts);
-  container.append(button);
+  container.append(hearts, button);
 
   return container;
 };

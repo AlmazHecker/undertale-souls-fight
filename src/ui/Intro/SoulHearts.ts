@@ -1,6 +1,6 @@
 import "./SoulHearts.css";
-import { SOULS } from "../../utils/constants.ts";
-import HeartIcon from "../../assets/fight/heart.svg?raw";
+import { SOULS } from "@/utils/constants.ts";
+import HeartIcon from "@/assets/images/heart.svg?raw";
 
 const SoulHearts = () => {
   const container = document.createElement("div");

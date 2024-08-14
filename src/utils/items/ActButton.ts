@@ -1,10 +1,10 @@
 import { Assets, Sprite, Texture } from "pixi.js";
 
-import { BaseItem } from "./BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 import { Heart } from "./Heart.ts";
 import { animateWithTimer } from "../helpers/timing.helper.ts";
 import { arePolygonsColliding } from "../helpers/pixi.helper.ts";
-import actPng from "@/assets/fight/act.png";
+import actPng from "@/assets/images/act.png";
 
 export class ActButton extends BaseItem {
   constructor(texture?: Texture, x = 0, y = 0) {
@@ -20,8 +20,7 @@ export class ActButton extends BaseItem {
   }
 
   public async initialize() {
-    const actButtonTexture = await Assets.load(actPng);
-    this.container.texture = actButtonTexture;
+    this.container.texture = await Assets.load(actPng);
   }
 
   public isCollidingWithHeart(heart: Heart) {

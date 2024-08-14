@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import { ItemOptions } from "@/utils/types.ts";
-import { BaseItem } from "@/utils/items/BaseItem.ts";
+import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Pan extends BaseItem {
   constructor(options: ItemOptions) {

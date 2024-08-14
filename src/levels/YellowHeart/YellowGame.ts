@@ -3,7 +3,7 @@ import { Sprite } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
 import { Health } from "@/ui/Health/Health.ts";
 import { PistolManager } from "@/levels/YellowHeart/helpers/PistolManager.ts";
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 
 export class YellowGame extends BaseGame {
   private pistolManager: PistolManager;
@@ -15,6 +15,7 @@ export class YellowGame extends BaseGame {
     onFinish: () => void,
   ) {
     super(app, heart, health, onFinish);
+    heart.maxHeightFromBottom = 0;
     this.pistolManager = new PistolManager(app, heart);
   }
 

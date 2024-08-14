@@ -1,4 +1,4 @@
-import { BaseGame } from "@/utils/helpers/BaseGame.ts";
+import { BaseGame } from "@/core/BaseGame.ts";
 import { Modal } from "../Modal/Modal.ts";
 import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 

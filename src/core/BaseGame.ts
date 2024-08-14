@@ -1,7 +1,7 @@
 import { Application, Container, Ticker } from "pixi.js";
 import EventEmitter from "eventemitter3";
-import { Heart } from "../items/Heart.ts";
-import { createTicker } from "./pixi.helper.ts";
+import { Heart } from "../utils/items/Heart.ts";
+import { createTicker } from "../utils/helpers/pixi.helper.ts";
 import { Health } from "@/ui/Health/Health.ts";
 
 interface GameEvents {
@@ -51,7 +51,7 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
     // throttling типа
     if (status === this.status) return;
 
-    if (status === "PREPARING_HELP" && this.preparingHelp) {
+    if (status === "PREPARING_HELP") {
       this.preparingHelp();
     }
 
