@@ -17,6 +17,7 @@ import snd3 from "@/assets/music/mus_f_6s_3.ogg";
 import snd4 from "@/assets/music/mus_f_6s_4.ogg";
 import snd5 from "@/assets/music/mus_f_6s_5.ogg";
 import snd6 from "@/assets/music/mus_f_6s_6.ogg";
+import { Credits } from "@/ui/Credits/Credits.ts";
 const audios = [snd1, snd2, snd3, snd4, snd5, snd6];
 
 export class View {
@@ -29,7 +30,7 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 2;
+  private currentLevel = 0;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,
@@ -48,7 +49,7 @@ export class View {
       await this.setupView();
       this.currentLevel++;
     } else {
-      console.log("All views completed!");
+      this.container.append(Credits());
     }
   };
 
