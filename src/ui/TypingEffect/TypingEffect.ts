@@ -1,22 +1,28 @@
 import css from "./TypingEffect.module.css";
+import { Sound } from "@/config/Sound.ts";
+import typingSnd from "@/assets/music/snd_txtasg.wav";
 
 type TypingEffectProps = {
   text: string;
   speed?: number;
   className?: string;
   onAnimationEnd?: () => void;
+  soundEnabled?: boolean;
 };
 
 export class TypingEffect {
+  private readonly typingSound = new Sound(typingSnd);
   private readonly container: HTMLDivElement;
   private readonly speed: number = 50;
   private readonly onAnimationEnd?: () => void;
+  private readonly soundEnabled: boolean = false;
   private text: string;
   private charIndex: number;
 
   constructor(options: TypingEffectProps) {
     this.text = options.text;
     this.speed = options.speed || 50;
+    this.soundEnabled = options.soundEnabled || false;
     this.container = document.createElement("div");
     this.container.className = css["typing-effect"];
     if (options.className) this.container.classList.add(options.className);
@@ -24,11 +30,17 @@ export class TypingEffect {
     this.container.style.minWidth = `${options.text.length - 1}ch`;
     this.onAnimationEnd = options.onAnimationEnd;
     this.charIndex = 0;
-
     this.typeNextChar = this.typeNextChar.bind(this);
+    this.initialize();
   }
 
-  typeNextChar() {
+  public async initialize() {
+    return this.typingSound.load();
+  }
+
+  public typeNextChar() {
+    if (this.soundEnabled) this.typingSound.play(0.7);
+
     if (this.charIndex < this.text.length) {
       const currentChar = this.text.charAt(this.charIndex);
       this.container.textContent += currentChar;
@@ -39,11 +51,11 @@ export class TypingEffect {
     }
   }
 
-  remove() {
+  public remove() {
     this.container.remove();
   }
 
-  render() {
+  public render() {
     this.typeNextChar();
     return this.container;
   }

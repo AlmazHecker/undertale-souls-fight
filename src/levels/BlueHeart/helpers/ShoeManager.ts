@@ -83,7 +83,6 @@ export class ShoeManager {
     for (let i = 0; i < shoes.length; i++) {
       const shoe = shoes[i];
       shoe.x -= shoeSpeed;
-
       if (shoe.x + shoeWidth < 0) {
         shoe.x = lastShoeX + shoeWidth + shoeSpacing;
 

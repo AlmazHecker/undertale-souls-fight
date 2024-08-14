@@ -1,49 +1,57 @@
 .hearts {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: auto;
+  position: relative;
+  width: 350px;
+  height: 350px;
+  margin: auto;
 }
 .hearts > div {
-    position: absolute;
-    display: grid;
-    place-content: center;
-    transition: left 0.3s ease, top 0.3s ease;
-    opacity: 0;
+  position: absolute;
+  display: grid;
+  place-content: center;
+  transition:
+    left 0.3s ease,
+    top 0.3s ease;
+  opacity: 0;
+  scale: 1.2;
 }
+
+:root {
+  --radius: 150px;
+}
+
 .hearts > div:nth-of-type(1) {
-    color: cyan;
-    left: calc(50% + 120px);
-    top: calc(50% + 0px);
-    transform: translate(-50%, -50%);
+  color: cyan;
+  left: calc(50% + var(--radius));
+  top: calc(50% + 0px);
+  transform: translate(-50%, -50%);
 }
 .hearts > div:nth-of-type(2) {
-    color: orange;
-    left: calc(50% + 60px);
-    top: calc(50% + 104px);
-    transform: translate(-50%, -50%);
+  color: orange;
+  left: calc(50% + calc(var(--radius) / 2));
+  top: calc(50% + calc(var(--radius) * 0.866)); /* 0.866 is sin(60°) */
+  transform: translate(-50%, -50%);
 }
 .hearts > div:nth-of-type(3) {
-    color: blue;
-    left: calc(50% - 60px);
-    top: calc(50% + 104px);
-    transform: translate(-50%, -50%);
+  color: blue;
+  left: calc(50% - calc(var(--radius) / 2));
+  top: calc(50% + calc(var(--radius) * 0.866));
+  transform: translate(-50%, -50%);
 }
 .hearts > div:nth-of-type(4) {
-    color: purple;
-    left: calc(50% - 120px);
-    top: calc(50% + 0px);
-    transform: translate(-50%, -50%);
+  color: purple;
+  left: calc(50% - var(--radius));
+  top: calc(50% + 0px);
+  transform: translate(-50%, -50%);
 }
 .hearts > div:nth-of-type(5) {
-    color: green;
-    left: calc(50% - 60px);
-    top: calc(50% - 104px);
-    transform: translate(-50%, -50%);
+  color: green;
+  left: calc(50% - calc(var(--radius) / 2));
+  top: calc(50% - calc(var(--radius) * 0.866));
+  transform: translate(-50%, -50%);
 }
 .hearts > div:nth-of-type(6) {
-    color: yellow;
-    left: calc(50% + 60px);
-    top: calc(50% - 104px);
-    transform: translate(-50%, -50%);
+  color: yellow;
+  left: calc(50% + calc(var(--radius) / 2));
+  top: calc(50% - calc(var(--radius) * 0.866));
+  transform: translate(-50%, -50%);
 }

@@ -1,7 +1,7 @@
 import { ContainerChild } from "pixi.js";
 
-export const getRandomIndex = (words: unknown[]) => {
-  return Math.floor(Math.random() * words.length);
+export const getRandomIndex = (arr: unknown[]) => {
+  return Math.floor(Math.random() * arr.length);
 };
 
 export const getRandomBoolean = () => Math.random() >= 0.5;

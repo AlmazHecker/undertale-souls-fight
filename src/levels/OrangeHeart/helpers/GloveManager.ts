@@ -11,10 +11,7 @@ import {
   easeInOut,
   lerp,
 } from "@/utils/helpers/timing.helper.ts";
-import {
-  getRandomBoolean,
-  getRandomIndex,
-} from "@/utils/helpers/random.helper.ts";
+import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
 import { Glove } from "../assets/sprite/Glove.ts";
 import {
   arePolygonsColliding,
@@ -30,7 +27,7 @@ export class GloveManager {
     () => new PIXI.Container(),
   );
   private minRadius = 50;
-  private maxRadius = 140;
+  private maxRadius = 120;
   private rotationSpeed = 0.007;
   private ticker = createTicker();
   private stop: boolean = false;
@@ -67,7 +64,7 @@ export class GloveManager {
       const row = Math.floor(i / numColumns);
       const column = i % numColumns;
 
-      const y = row * offsetY + (column === 1 ? 250 : 0);
+      const y = row * offsetY + (column === 1 ? 250 : 150);
       const x = column * offsetX;
 
       container.x = x;
@@ -172,7 +169,7 @@ export class GloveManager {
   }
 
   private createActButton() {
-    const randomContainerIndex = getRandomBoolean() ? 1 : 4;
+    const randomContainerIndex = getRandomIndex(this.gloveContainers);
     this.gloveContainers[randomContainerIndex].addChild(
       this.actButton.container,
     );

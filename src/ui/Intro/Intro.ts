@@ -61,7 +61,7 @@ type IntroProps = {
 };
 const Intro = ({ nextView }: IntroProps) => {
   const hearts = SoulHearts();
-  const button = Button({ text: "START GAME" });
+  const button = Button({ text: "* START GAME" });
   button.style.margin = "0 auto";
   button.onclick = async () => {
     button.disabled = true;

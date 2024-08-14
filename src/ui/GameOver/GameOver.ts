@@ -32,6 +32,7 @@ export const GameOver = ({ onExit }: GameOverProps) => {
     text,
     className: css.message,
     speed: 80,
+    soundEnabled: true,
   });
 
   const handleEnterClick = (e: KeyboardEvent) => {
@@ -42,7 +43,9 @@ export const GameOver = ({ onExit }: GameOverProps) => {
         text: "Stay determined...",
         className: css.message,
         speed: 80,
+        soundEnabled: true,
       });
+
       content.appendChild(newText.render());
 
       window.addEventListener("keydown", destroy, { once: true });

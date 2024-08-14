@@ -1,21 +1,20 @@
-
 .modal-wrapper {
-    position: fixed;
-    font-family: "Determination";
-    bottom: 5%;
-    z-index: 999;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  font-family: "Determination";
+  top: 10%;
+  z-index: 999;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
-    background-color: black;
-    border: 6px solid white;
-    padding: 10px 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    white-space: nowrap;
+  background-color: black;
+  border: 6px solid white;
+  padding: 10px 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  white-space: nowrap;
 }

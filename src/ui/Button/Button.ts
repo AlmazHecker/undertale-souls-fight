@@ -1,4 +1,4 @@
-import "./Button.css";
+import css from "./Button.module.css";
 
 type ButtonProps = Partial<HTMLButtonElement> & {
   text: string;
@@ -6,7 +6,7 @@ type ButtonProps = Partial<HTMLButtonElement> & {
 const Button = (props: ButtonProps) => {
   const button = document.createElement("button");
   button.textContent = props.text;
-  button.className = "button";
+  button.className = css.button;
 
   return button;
 };
