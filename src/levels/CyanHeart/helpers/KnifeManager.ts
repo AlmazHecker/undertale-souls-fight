@@ -3,7 +3,10 @@ import { Application, Assets, Sprite } from "pixi.js";
 import knifePng from "../assets/img/knife.png";
 
 import plasterPng from "../assets/img/plaster.png";
-import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
+import {
+  arePolygonsColliding,
+  isOutOfCanvas,
+} from "@/utils/helpers/pixi.helper.ts";
 import { shuffleArray } from "@/utils/helpers/random.helper.ts";
 import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 import { Heart } from "@/utils/items/Heart.ts";
@@ -24,6 +27,7 @@ export class KnifeManager {
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
+    private readonly actButtonCountDown: number,
   ) {}
 
   async initialize() {
@@ -107,15 +111,22 @@ export class KnifeManager {
     this.knifeContainer.addChild(this.actButton.container);
     setTimeout(() => {
       this.replaceRandomKnifeWithActButton(this.actButton);
-      // }, 10000);
-    }, 0);
+    }, this.actButtonCountDown);
   }
 
+  private getRandomKnifeIndex() {
+    let index;
+    let knife;
+
+    do {
+      index = Math.floor(Math.random() * this.knifeContainer.children.length);
+      knife = this.knifeContainer.children[index];
+    } while (isOutOfCanvas(knife, this.app));
+
+    return knife;
+  }
   public replaceRandomKnifeWithActButton(actButton: ActButton) {
-    // const randomIndex = Math.floor(
-    //   Math.random() * this.knifeContainer.children.length,
-    // );
-    const knife = this.knifeContainer.children[10];
+    const knife = this.getRandomKnifeIndex();
     actButton.container.position.set(knife.x + 8 / 2, knife.y + 16 / 2);
 
     actButton.container.visible = true;

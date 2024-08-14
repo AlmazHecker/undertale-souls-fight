@@ -14,26 +14,23 @@ import { animateWithTimer, lerp } from "@/utils/helpers/timing.helper.ts";
 
 export class ShoeManager {
   private spriteYMap = new Map<PIXI.Sprite, number>();
-
-  private readonly app: Application;
-  private readonly heart: Heart;
-  public actButton = new ActButton();
-
-  public shoes: Sprite[] = [];
-  private readonly defaultY: number;
-
   private bottomOffset = 50;
   private shoeSpacing = 20;
   private shoeSpeed = 2.3;
   private shoeWidth = 70;
   private shoeHeight = 150;
-  public verticalMoveDisabled: boolean = false;
+  public actButton = new ActButton();
+  private actButtonOffset = 20; // Offset for actButtonSprite to appear lower
+  private verticalMoveDisabled: boolean = false;
 
-  private actButtonOffset = 10; // Offset for actButtonSprite to appear lower
+  private readonly shoes: Sprite[] = [];
+  private readonly defaultY: number;
 
-  constructor(app: Application, heart: Heart) {
-    this.app = app;
-    this.heart = heart;
+  constructor(
+    private readonly app: Application,
+    private readonly heart: Heart,
+    private readonly actButtonCountDown: number,
+  ) {
     this.defaultY =
       this.app.renderer.height - this.shoeHeight - this.bottomOffset;
   }
@@ -110,10 +107,10 @@ export class ShoeManager {
     this.app.stage.addChild(this.actButton.container);
     setTimeout(() => {
       this.replaceRandomShoeWithActButton(this.actButton);
-    }, 3000);
+    }, this.actButtonCountDown);
   }
 
-  startVerticalMovement(sprite: PIXI.Sprite, bottomOffset: number) {
+  private startVerticalMovement(sprite: PIXI.Sprite, bottomOffset: number) {
     if (!this.spriteYMap.has(sprite)) {
       this.spriteYMap.set(sprite, sprite.y);
     }
@@ -150,6 +147,7 @@ export class ShoeManager {
   }
 
   public async helpUser() {
+    this.verticalMoveDisabled = true;
     this.actButton.disappear();
 
     // targetY - на сколько пикселец поднимутся элементы

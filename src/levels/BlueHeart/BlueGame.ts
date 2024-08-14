@@ -18,7 +18,7 @@ export class BlueGame extends BaseGame {
     onFinish: () => void,
   ) {
     super(app, heart, health, onFinish);
-    this.shoeManager = new ShoeManager(app, heart);
+    this.shoeManager = new ShoeManager(app, heart, 10000);
     this.starManager = new StarManager(app, heart);
     this.heart.maxHeightFromBottom = 60;
   }
@@ -55,7 +55,6 @@ export class BlueGame extends BaseGame {
   }
 
   async helpUser() {
-    this.shoeManager.verticalMoveDisabled = true;
     await Promise.all([
       this.shoeManager.helpUser(),
       this.starManager.helpUser(),

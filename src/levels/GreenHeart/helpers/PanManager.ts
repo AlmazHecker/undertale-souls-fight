@@ -15,8 +15,7 @@ import {
 } from "@/utils/helpers/random.helper.ts";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Pan } from "@/levels/GreenHeart/assets/sprite/Pan.ts";
-import { Fire } from "@/levels/GreenHeart/assets/sprite/Fire.ts";
-import { EGG_POLYGON } from "@/levels/GreenHeart/assets/sprite/Egg.ts";
+import { EGG_POLYGON, Fire } from "@/levels/GreenHeart/assets/sprite/Fire.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class PanManager {

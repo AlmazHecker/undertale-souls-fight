@@ -15,7 +15,7 @@ export class OrangeGame extends BaseGame {
     onFinish: () => void,
   ) {
     super(app, heart, health, onFinish);
-    this.gloveManager = new GloveManager(app, heart);
+    this.gloveManager = new GloveManager(app, heart, 10000);
   }
 
   async initialize() {

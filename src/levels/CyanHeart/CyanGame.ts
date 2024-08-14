@@ -16,7 +16,7 @@ export class CyanGame extends BaseGame {
     onFinish: () => void,
   ) {
     super(app, heart, health, onFinish);
-    this.knifeManager = new KnifeManager(app, heart);
+    this.knifeManager = new KnifeManager(app, heart, 10000);
   }
 
   async initialize() {

@@ -20,17 +20,18 @@ import { ActButton } from "@/utils/items/ActButton.ts";
 
 export class TextManager {
   public actButton = new ActButton();
-  public texts: PIXI.Text[] = [];
-  private textHeight = 50;
-  private textSpacing = 0;
-  private moveSpeed = 2;
+  private readonly textHeight = 50;
+  private readonly textSpacing = 0;
+  private readonly moveSpeed = 2;
+  private readonly yAxis: number[] = [];
+  private texts: PIXI.Text[] = [];
   private activeWords: string[] = BAD_WORDS;
-  private yAxis: number[] = [];
   private stop: boolean = false;
 
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
+    private readonly actButtonCountDown: number,
   ) {}
 
   async initialize() {
@@ -82,7 +83,7 @@ export class TextManager {
     this.app.stage.addChild(this.actButton.container);
     setTimeout(() => {
       this.replaceRandomTextWithActButton(this.actButton);
-    }, 10000);
+    }, this.actButtonCountDown);
   }
 
   public replaceRandomTextWithActButton(actButton: ActButton) {

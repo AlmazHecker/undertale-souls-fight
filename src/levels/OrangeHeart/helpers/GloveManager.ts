@@ -12,13 +12,12 @@ import {
   lerp,
 } from "@/utils/helpers/timing.helper.ts";
 import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
-import { Glove } from "../assets/sprite/Glove.ts";
+import { Glove, LIKE_POLYGON } from "../assets/sprite/Glove.ts";
 import {
   arePolygonsColliding,
   createTicker,
 } from "@/utils/helpers/pixi.helper.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
-import { LIKE_POLYGON } from "@/levels/OrangeHeart/assets/sprite/Like.ts";
 
 export class GloveManager {
   public actButton = new ActButton();
@@ -35,6 +34,7 @@ export class GloveManager {
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
+    private readonly actButtonCountDown: number,
   ) {}
 
   async initialize() {
@@ -176,7 +176,7 @@ export class GloveManager {
 
     setTimeout(() => {
       this.replaceWithActButton(this.actButton, randomContainerIndex);
-    }, 10000);
+    }, this.actButtonCountDown);
   }
 
   async helpUser() {
