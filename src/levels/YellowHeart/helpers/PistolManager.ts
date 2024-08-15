@@ -1,11 +1,5 @@
 import { Heart } from "@/utils/items/Heart.tsx";
 import { Application, Assets, Sprite, Texture } from "pixi.js";
-import pistolPng from "@/levels/YellowHeart/assets/img/pistol.png";
-import bulletPng from "@/levels/YellowHeart/assets/img/bullet.png";
-
-import pistolAimPng from "@/levels/YellowHeart/assets/img/pistol-aim.png";
-import heartAimPng from "@/levels/YellowHeart/assets/img/heart-aim.png";
-import flowerPng from "@/levels/YellowHeart/assets/img/flower.png";
 
 import {
   arePolygonsColliding,
@@ -46,11 +40,12 @@ export class PistolManager {
     const appCenterX = this.app.renderer.width / 2;
     const appCenterY = this.app.renderer.height / 2;
 
-    this.aimTexture = await Assets.load(pistolAimPng);
-    this.bulletTexture = await Assets.load(bulletPng);
-    this.heartAimTexture = await Assets.load(heartAimPng);
-    this.flowerTexture = await Assets.load(flowerPng);
-    const pistolTexture = await Assets.load(pistolPng);
+    const assets = await Assets.loadBundle("yellow");
+    this.aimTexture = assets.pistolAim;
+    this.bulletTexture = assets.bullet;
+    this.heartAimTexture = assets.heartAim;
+    this.flowerTexture = assets.flower;
+    const pistolTexture = assets.pistol;
 
     this.pistol = new Pistol({ texture: pistolTexture });
     this.pistol.container.width = 160;

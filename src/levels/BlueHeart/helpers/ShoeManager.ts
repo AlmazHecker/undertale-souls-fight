@@ -2,7 +2,6 @@ import { Heart } from "@/utils/items/Heart.ts";
 
 import * as PIXI from "pixi.js";
 import { Application, Assets, Sprite } from "pixi.js";
-import shoePng from "../assets/img/shoe.png";
 
 import { Shoe } from "../assets/sprite/Shoe.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
@@ -37,17 +36,18 @@ export class ShoeManager {
 
   async initialize() {
     await this.actButton.initialize();
+    const bundleAssets = await Assets.loadBundle("blue");
+
     const numShoesX =
       Math.floor(
         this.app.renderer.width / (this.shoeWidth + this.shoeSpacing),
       ) + 1;
-    const shoeTexture = await Assets.load(shoePng);
 
     for (let i = 0; i < numShoesX; i++) {
       const x =
         this.app.renderer.width + i * (this.shoeWidth + this.shoeSpacing);
       const y = this.defaultY;
-      const shoe = new Shoe(x, y, shoeTexture);
+      const shoe = new Shoe(x, y, bundleAssets.shoe);
       this.app.stage.addChild(shoe.container);
       this.shoes.push(shoe.container);
 

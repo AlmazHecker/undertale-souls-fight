@@ -1,16 +1,14 @@
 import css from "./Credits.module.css";
 import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
-import { Sound } from "@/config/Sound.ts";
-import introSnd from "@/assets/music/mus_intronoise.ogg";
+import { SHARED_SOUNDS } from "@/config/preload.ts";
 
 export class Credits {
   private readonly container = createElementWithClass("div", css.container);
-  private readonly introSound = new Sound(introSnd);
+  private readonly introSound = SHARED_SOUNDS.introSound;
 
   private txtContent = "";
 
   async initialize() {
-    await this.introSound.load();
     this.txtContent = (await import("./content.txt?raw")).default;
   }
 

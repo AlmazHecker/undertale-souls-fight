@@ -48,7 +48,6 @@ export class Sound {
     };
 
     const gainNode = context.createGain();
-
     gainNode.gain.value = volume;
 
     source.connect(gainNode).connect(context.destination);

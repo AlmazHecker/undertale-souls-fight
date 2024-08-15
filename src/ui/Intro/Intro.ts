@@ -1,11 +1,9 @@
 import SoulHearts from "./SoulHearts.ts";
 import Button from "../Button/Button.ts";
-import { Sound } from "@/config/Sound.ts";
-import noiseSnd from "@/assets/music/snd_noise.wav";
-import battleFall from "@/assets/music/snd_battlefall.wav";
+import { SHARED_SOUNDS } from "@/config/preload.ts";
 
 const animateElements = async (elements: HTMLCollection): Promise<boolean> => {
-  const blinkSound = await new Sound(noiseSnd).load();
+  const blinkSound = SHARED_SOUNDS.blinkSound;
 
   return new Promise((resolve) => {
     const fadeInDuration = 140;
@@ -73,7 +71,7 @@ const Intro = ({ nextView }: IntroProps) => {
     window.removeEventListener("keydown", enterListener);
     button.disabled = true;
 
-    const playBattleFallSound = await new Sound(battleFall).load();
+    const playBattleFallSound = SHARED_SOUNDS.battleFall;
     await animateElements(hearts.children);
 
     setTimeout(() => playBattleFallSound.play(), 300);

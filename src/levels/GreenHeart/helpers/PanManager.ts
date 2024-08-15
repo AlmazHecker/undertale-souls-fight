@@ -1,8 +1,5 @@
 import { Heart } from "@/utils/items/Heart.tsx";
 import { Application, Assets, Polygon, Sprite, Texture } from "pixi.js";
-import panPng from "@/levels/GreenHeart/assets/img/pan.png";
-import firePng from "@/levels/GreenHeart/assets/img/fire.png";
-import eggPng from "@/levels/GreenHeart/assets/img/egg.png";
 
 import {
   animateWithTimer,
@@ -42,9 +39,10 @@ export class PanManager {
 
   async initialize() {
     await this.actButton.initialize();
-    this.fireTexture = await Assets.load(firePng);
-    this.eggTexture = await Assets.load(eggPng);
-    const panTexture = await Assets.load(panPng);
+    const assets = await Assets.loadBundle("green");
+    this.fireTexture = assets.fire;
+    this.eggTexture = assets.egg;
+    const panTexture = assets.pan;
 
     const itemCount = 3;
     const totalWidth = this.app.renderer.width;

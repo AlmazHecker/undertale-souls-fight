@@ -9,8 +9,8 @@ import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 type GameOverProps = {
   onExit: () => void;
 };
+const gameOverSound = new Audio(gameOverSnd);
 export const GameOver = ({ onExit }: GameOverProps) => {
-  const gameOverSound = new Audio(gameOverSnd);
   gameOverSound.loop = true;
 
   const container = createElementWithClass("div", css.container);

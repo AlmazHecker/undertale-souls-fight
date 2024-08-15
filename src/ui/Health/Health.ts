@@ -1,17 +1,16 @@
 import css from "./Health.module.css";
 import EventEmitter from "eventemitter3";
-import { Sound } from "@/config/Sound.ts";
-import healSnd from "@/assets/music/snd_heal_c.wav";
-import hurtSnd from "@/assets/music/snd_hurt.wav";
+
 import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
+import { SHARED_SOUNDS } from "@/config/preload.ts";
 
 interface Events {
   health: (points: number) => void;
 }
 
 export class Health extends EventEmitter<Events> {
-  private readonly healSound = new Sound(healSnd);
-  private readonly hurtSound = new Sound(hurtSnd);
+  private readonly healSound = SHARED_SOUNDS.healSound;
+  private readonly hurtSound = SHARED_SOUNDS.hurtSound;
 
   public container = createElementWithClass("div", css["health-bar"]);
   public healthPoint = createElementWithClass("div", css["health-point"]);
@@ -24,8 +23,6 @@ export class Health extends EventEmitter<Events> {
   }
 
   async initialize() {
-    await Promise.all([this.healSound.load(), this.hurtSound.load()]);
-
     this.container.append(this.healthPoint);
   }
 

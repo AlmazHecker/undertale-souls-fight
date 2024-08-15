@@ -1,6 +1,5 @@
 import { Application, Assets, Container } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
-import notePng from "@/levels/PurpleHeart/assets/img/note.png";
 import { areRectanglesColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Note } from "@/levels/PurpleHeart/assets/sprite/Note.ts";
 
@@ -16,19 +15,19 @@ export class NoteManager {
   ) {}
 
   async initialize() {
-    const noteTexture = await Assets.load(notePng);
+    const assets = await Assets.loadBundle("purple");
 
     const numNotesY = Math.ceil(this.app.renderer.height / this.noteHeight) + 1;
     const canvasWidth = this.app.renderer.width;
 
     for (let y = 0; y <= numNotesY; y++) {
-      const note = new Note(noteTexture, 0, y * this.noteHeight);
+      const note = new Note(assets.note, 0, y * this.noteHeight);
       this.leftNotes.push(note.container);
       this.app.stage.addChild(note.container);
     }
 
     for (let y = 0; y <= numNotesY; y++) {
-      const note = new Note(noteTexture, canvasWidth, y * this.noteHeight);
+      const note = new Note(assets.note, canvasWidth, y * this.noteHeight);
       note.container.rotation = Math.PI;
       this.rightNotes.push(note.container);
       this.app.stage.addChild(note.container);

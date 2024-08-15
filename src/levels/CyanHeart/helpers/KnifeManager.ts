@@ -1,8 +1,6 @@
 import * as PIXI from "pixi.js";
-import { Application, Assets, Sprite } from "pixi.js";
-import knifePng from "../assets/img/knife.png";
+import { Application, Assets, Sprite, Texture } from "pixi.js";
 
-import plasterPng from "../assets/img/plaster.png";
 import {
   arePolygonsColliding,
   isOutOfCanvas,
@@ -19,6 +17,7 @@ export class KnifeManager {
   private rotationSpeed = 0.025;
   private moveDuration = 3000;
   private timerIds: ReturnType<typeof setTimeout>[] = [];
+  private plasterTexture!: Texture;
 
   public knifeContainer = new PIXI.Container<Sprite>();
   private stop: boolean = false;
@@ -32,7 +31,9 @@ export class KnifeManager {
 
   async initialize() {
     await this.actButton.initialize();
-    const knifeTexture = await Assets.load(knifePng);
+
+    const assets = await Assets.loadBundle("cyan");
+    this.plasterTexture = assets.plaster;
 
     const numKnivesX = Math.ceil(
       this.app.renderer.width / (128 + this.knifeSpacing),
@@ -43,7 +44,7 @@ export class KnifeManager {
     for (let y = 0; y <= numKnivesY; y++) {
       for (let x = 0; x <= numKnivesX; x++) {
         const knife = new Knife(
-          knifeTexture,
+          assets.knife,
           x * (128 + this.knifeSpacing),
           y * (128 + this.knifeSpacing),
         );
@@ -137,7 +138,6 @@ export class KnifeManager {
 
   public async helpUser() {
     this.stopRhombusMovement = true;
-    const plasterTexture = await Assets.load(plasterPng);
 
     const centerX = this.app.renderer.width / 2;
     const centerY = this.app.renderer.height / 2;
@@ -146,7 +146,7 @@ export class KnifeManager {
     for (let i = 0; i < knives.length; i++) {
       const knife = this.knifeContainer.children[i];
       if (knife.label === "act-button") continue;
-      knife.texture = plasterTexture;
+      knife.texture = this.plasterTexture;
       knife.tint = "#07a108";
 
       const startX = knife.x;

@@ -1,6 +1,4 @@
-import { Application, Assets, Container, Sprite } from "pixi.js";
-import starPng from "../assets/img/star.png";
-import musicPng from "../assets/img/music.png";
+import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
 import { Star } from "../assets/sprite/Star.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
@@ -12,6 +10,7 @@ export class StarManager {
   private starSize = 30;
   private starSpacing = 15;
   private starRotation = 0.1;
+  private musicTexture!: Texture;
 
   constructor(
     private readonly app: Application,
@@ -22,13 +21,14 @@ export class StarManager {
     const numStarsX =
       Math.floor(this.app.renderer.width / (this.starSize + this.starSpacing)) +
       1;
-    const starTexture = await Assets.load(starPng);
+    const assets = await Assets.loadBundle("blue");
+    this.musicTexture = assets.music;
 
     for (let i = 0; i < numStarsX; i++) {
       const x =
         this.app.renderer.width + i * (this.starSize + this.starSpacing);
       const y = this.app.renderer.height / 2 + this.starSize + 170;
-      const star = new Star(x, y, starTexture);
+      const star = new Star(x, y, assets.star);
       this.starContainer.addChild(star.container);
     }
     this.app.stage.addChild(this.starContainer);
@@ -54,7 +54,6 @@ export class StarManager {
   }
 
   public async helpUser() {
-    const musicTexture = await Assets.load(musicPng);
     this.starSpeed = 0;
     this.starRotation = 0;
 
@@ -62,7 +61,7 @@ export class StarManager {
       const star = this.starContainer.children[i];
 
       star.rotation = 0;
-      star.texture = musicTexture;
+      star.texture = this.musicTexture!;
       star.tint = "#07a108";
       vibrate({
         container: star,

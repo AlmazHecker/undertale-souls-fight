@@ -1,8 +1,5 @@
 import * as PIXI from "pixi.js";
-import { Application, Assets, Polygon, Sprite } from "pixi.js";
-
-import glovePng from "../assets/img/glove.png";
-import likePng from "../assets/img/like.png";
+import { Application, Assets, Polygon, Sprite, Texture } from "pixi.js";
 
 import { Heart } from "@/utils/items/Heart.ts";
 import {
@@ -33,6 +30,7 @@ export class GloveManager {
   private rotationSpeed = 0.007;
   private ticker = createTicker();
   private stop: boolean = false;
+  private likeTexture!: Texture;
 
   constructor(
     private readonly app: Application,
@@ -42,7 +40,8 @@ export class GloveManager {
 
   async initialize() {
     await this.actButton.initialize();
-    const gloveTexture = await Assets.load(glovePng);
+    const assets = await Assets.loadBundle("orange");
+    this.likeTexture = assets.like;
 
     const numSprites = 7;
     const angleStep = (2 * Math.PI) / numSprites;
@@ -77,7 +76,7 @@ export class GloveManager {
       for (let j = 0; j < numSprites; j++) {
         const angle = j * angleStep;
 
-        const glove = new Glove({ texture: gloveTexture });
+        const glove = new Glove({ texture: assets.glove });
 
         const sprite = glove.container;
 
@@ -183,12 +182,11 @@ export class GloveManager {
   }
 
   async helpUser() {
-    const likeTexture = await Assets.load(likePng);
     this.gloveContainers.forEach((gloveContainer) => {
       return gloveContainer.children.forEach((glove) => {
         if (glove.label === "act-button") return;
         glove.hitArea = new Polygon(LIKE_POLYGON);
-        glove.texture = likeTexture;
+        glove.texture = this.likeTexture;
 
         glove.tint = "#07a108";
       });
