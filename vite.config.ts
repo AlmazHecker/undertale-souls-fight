@@ -9,4 +9,5 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
+  base: "/undertale-souls-fight",
 });
