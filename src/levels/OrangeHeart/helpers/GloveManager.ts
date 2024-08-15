@@ -11,7 +11,10 @@ import {
   easeInOut,
   lerp,
 } from "@/utils/helpers/timing.helper.ts";
-import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
+import {
+  getRandomBoolean,
+  getRandomIndex,
+} from "@/utils/helpers/random.helper.ts";
 import { Glove, LIKE_POLYGON } from "../assets/sprite/Glove.ts";
 import {
   arePolygonsColliding,
@@ -132,7 +135,7 @@ export class GloveManager {
       }
       container.y += 1;
 
-      if (container.y > this.app.renderer.height) {
+      if (container.y - this.maxRadius > this.app.renderer.height) {
         container.y = -container.height;
       }
     });
@@ -169,7 +172,7 @@ export class GloveManager {
   }
 
   private createActButton() {
-    const randomContainerIndex = getRandomIndex(this.gloveContainers);
+    const randomContainerIndex = getRandomBoolean() ? 1 : 4;
     this.gloveContainers[randomContainerIndex].addChild(
       this.actButton.container,
     );

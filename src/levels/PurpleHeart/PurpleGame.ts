@@ -20,8 +20,7 @@ export class PurpleGame extends BaseGame {
   ) {
     super(app, heart, health, onFinish);
     heart.maxHeightFromBottom = 0;
-    heart.container.x = app.renderer.width / 2;
-    heart.container.y = app.renderer.height / 2;
+
     this.textManager = new TextManager(app, heart, 10000);
     this.noteManager = new NoteManager(app, heart);
 

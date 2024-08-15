@@ -14,7 +14,7 @@ export class YellowGame extends BaseGame {
     health: Health,
     onFinish: () => void,
   ) {
-    super(app, heart, health, onFinish);
+    super(app, heart, health, onFinish, -5);
     heart.maxHeightFromBottom = 0;
     this.pistolManager = new PistolManager(app, heart);
   }

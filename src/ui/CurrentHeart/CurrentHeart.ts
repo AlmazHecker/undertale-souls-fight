@@ -1,6 +1,7 @@
 import { SOULS } from "@/utils/constants.ts";
 import css from "./CurrentHeart.module.css";
 import tvScreenSrc from "@/ui/CurrentHeart/tv-screen.png";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 type CurrentSoulArgs = {
   soulIndex: number;
@@ -9,11 +10,8 @@ type CurrentSoulArgs = {
 export const CurrentSoul = ({ soulIndex }: CurrentSoulArgs) => {
   const soul = SOULS[soulIndex];
 
-  const imageWrapper = document.createElement("div");
-  imageWrapper.className = css["image-wrapper"];
-
-  const tvScreen = document.createElement("img");
-  tvScreen.className = css["tv-screen"];
+  const imageWrapper = createElementWithClass("div", css["image-wrapper"]);
+  const tvScreen = createElementWithClass<"img">("img", css["tv-screen"]);
   tvScreen.src = tvScreenSrc;
   tvScreen.alt = "tv-screen";
 

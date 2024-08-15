@@ -3,6 +3,8 @@ import css from "./GameOver.module.css";
 import { TypingEffect } from "@/ui/TypingEffect/TypingEffect.ts";
 import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
 import gameOverSnd from "@/assets/music/mus_gameover.ogg";
+import { animateWithTimer, sleep } from "@/utils/helpers/timing.helper.ts";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 type GameOverProps = {
   onExit: () => void;
@@ -10,24 +12,16 @@ type GameOverProps = {
 export const GameOver = ({ onExit }: GameOverProps) => {
   const gameOverSound = new Audio(gameOverSnd);
   gameOverSound.loop = true;
-  gameOverSound.autoplay;
 
-  const container = document.createElement("div");
-  container.className = css.container;
-
-  const content = document.createElement("div");
-  content.className = css.content;
-
-  const title = document.createElement("h2");
-  title.className = css.title;
+  const container = createElementWithClass("div", css.container);
+  const content = createElementWithClass("div", css.content);
+  const title = createElementWithClass("h2", css.title);
   title.textContent = "GAME OVER";
 
-  const helperText = document.createElement("span");
+  const helperText = createElementWithClass("span", css.helpertext);
   helperText.textContent = "Press ENTER to start";
-  helperText.className = css.helpertext;
 
   const text = MESSAGES[getRandomIndex(MESSAGES)];
-
   const typingText = new TypingEffect({
     text,
     className: css.message,
@@ -35,40 +29,40 @@ export const GameOver = ({ onExit }: GameOverProps) => {
     soundEnabled: true,
   });
 
+  const video = createElementWithClass<"video">("video", css.video);
+  video.src = gameOverVideo;
+  video.autoplay = true;
+  video.width = 800;
+  video.height = 500;
+
   const handleEnterClick = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
       typingText.remove();
-
       const newText = new TypingEffect({
         text: "Stay determined...",
         className: css.message,
         speed: 80,
         soundEnabled: true,
       });
-
       content.appendChild(newText.render());
-
       window.addEventListener("keydown", destroy, { once: true });
     }
   };
 
-  const destroy = () => {
+  const destroy = async () => {
+    await animateWithTimer(1500, (progress) => {
+      container.style.opacity = `${1 - progress}`;
+    });
+    await sleep(500);
     gameOverSound.pause();
     gameOverSound.remove();
     onExit();
   };
 
-  const video = document.createElement("video");
-  video.className = css.video;
-  video.src = gameOverVideo;
-  video.autoplay = true;
-  video.width = 800;
-  video.height = 500;
   video.onended = () => {
     video.remove();
     content.appendChild(title);
-    container.appendChild(content);
-    container.appendChild(helperText);
+    container.append(content, helperText);
     gameOverSound.play();
     setTimeout(() => {
       content.appendChild(typingText.render());

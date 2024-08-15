@@ -1,6 +1,7 @@
 import css from "./TypingEffect.module.css";
 import { Sound } from "@/config/Sound.ts";
 import typingSnd from "@/assets/music/snd_txtasg.wav";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 type TypingEffectProps = {
   text: string;
@@ -12,7 +13,10 @@ type TypingEffectProps = {
 
 export class TypingEffect {
   private readonly typingSound = new Sound(typingSnd);
-  private readonly container: HTMLDivElement;
+  private readonly container = createElementWithClass(
+    "div",
+    css["typing-effect"],
+  );
   private readonly speed: number = 50;
   private readonly onAnimationEnd?: () => void;
   private readonly soundEnabled: boolean = false;
@@ -23,8 +27,6 @@ export class TypingEffect {
     this.text = options.text;
     this.speed = options.speed || 50;
     this.soundEnabled = options.soundEnabled || false;
-    this.container = document.createElement("div");
-    this.container.className = css["typing-effect"];
     if (options.className) this.container.classList.add(options.className);
     this.container.textContent = "";
     this.container.style.minWidth = `${options.text.length - 1}ch`;
@@ -52,6 +54,7 @@ export class TypingEffect {
   }
 
   public remove() {
+    this.typingSound.stop();
     this.container.remove();
   }
 

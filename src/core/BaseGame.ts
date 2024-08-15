@@ -28,6 +28,7 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
     public readonly heart: Heart,
     public readonly health: Health,
     protected readonly onFinish: () => void,
+    private readonly damage: number = -3,
   ) {
     super();
     this.ticker = createTicker();
@@ -71,7 +72,7 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
 
   public handleDamage(collisions: Container[]) {
     if (collisions.length !== 0 && !this.collisionCooldown) {
-      this.health.setHealthPoints(-3);
+      this.health.setHealthPoints(this.damage);
       this.heart.startBlinking();
       this.startCollisionCooldown();
     }

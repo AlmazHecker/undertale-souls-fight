@@ -115,11 +115,12 @@ export class KnifeManager {
   }
 
   private getRandomKnifeIndex() {
-    let index;
     let knife;
 
     do {
-      index = Math.floor(Math.random() * this.knifeContainer.children.length);
+      const index = Math.floor(
+        Math.random() * this.knifeContainer.children.length,
+      );
       knife = this.knifeContainer.children[index];
     } while (isOutOfCanvas(knife, this.app));
 

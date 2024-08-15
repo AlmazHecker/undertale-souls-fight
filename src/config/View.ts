@@ -39,7 +39,6 @@ export class View {
 
   async initialize() {
     await this.health.initialize();
-    this.container.append(Intro({ nextView: this.nextView }));
   }
 
   nextView = async () => {
@@ -49,19 +48,23 @@ export class View {
       await this.setupView();
       this.currentLevel++;
     } else {
-      this.container.append(Credits());
+      const credits = new Credits();
+      await credits.initialize();
+      this.container.append(credits.render());
     }
   };
 
   setupView = async () => {
-    const currentGame = this.levels[this.currentLevel];
+    const CurrentGame = this.levels[this.currentLevel];
 
-    const game = new currentGame(
+    const game = new CurrentGame(
       this.app,
       this.heart,
       this.health,
       this.nextView,
     );
+    this.heart.container.x = this.app.renderer.width / 2;
+    this.heart.container.y = this.app.renderer.height / 2;
 
     const music = new Audio(audios[this.currentLevel]);
     music.loop = true;
@@ -69,7 +72,6 @@ export class View {
     await GameLevel({ game, onLose: this.gameOver, music });
 
     const currentSoul = CurrentSoul({ soulIndex: this.currentLevel });
-
     this.container.append(currentSoul, this.app.canvas, this.health.container);
   };
 
@@ -78,7 +80,7 @@ export class View {
     this.container.append(
       GameOver({
         onExit: () => {
-          this.health.setHealthPoints(20);
+          this.health.setHealthPoints(20, false);
           this.container.innerHTML = "";
           this.currentLevel--;
           this.nextView();
@@ -86,4 +88,9 @@ export class View {
       }),
     );
   };
+
+  render() {
+    this.container.append(Intro({ nextView: this.nextView }));
+    return this.container;
+  }
 }

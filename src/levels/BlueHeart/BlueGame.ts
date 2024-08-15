@@ -71,11 +71,11 @@ export class BlueGame extends BaseGame {
     this.isBtnAndHeartColliding =
       this.shoeManager.actButton?.isCollidingWithHeart(this.heart) as boolean;
 
-    if (this.isBtnAndHeartColliding) return [];
-
     const collisions: Sprite[] = [];
     collisions.push(...this.shoeManager.infiniteShoesLogic());
     collisions.push(...this.starManager.infiniteStarsLogic());
+
+    if (this.isBtnAndHeartColliding) return [];
     return collisions;
   }
 

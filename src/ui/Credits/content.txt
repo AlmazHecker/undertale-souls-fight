@@ -1,0 +1,11 @@
+Hello! This is my first 2D game on the web. It took me 32 days to develop, and I've realized there's a lot to explore on the frontend. It's not just about buttons and inputs - graphics play a huge role too. Before this, I had zero knowledge of graphics. Developing this game taught me about running JavaScript on both the GPU and CPU.
+
+To develop I used 2D game engine called "Pixi.js". It does extra optimizations under the hood, which probably explains why my computer didn't explode.
+
+I used React to speed up development but realized it's not great for game dev. React’s rendering mechanism caused memory leaks and performance issues. At one point, I realized I was writing vanilla JS inside React, using imperative style.
+
+I didn't know that canvas runs on CPU. To run canvas on GPU you should use WEBGL or WebGPU APIs.
+
+Well, I used to think that developing games on the web was super hard and that the web wasn’t ready for it. But now I know—anything can be developed on the web!
+
+Of course, a huge thanks to ChatGPT!

@@ -1,13 +1,13 @@
 import css from "./Modal.module.css";
 import { TypingEffect } from "@/ui/TypingEffect/TypingEffect.ts";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 export class Modal {
   private visible: boolean = false;
-  private modalElement: HTMLDivElement = document.createElement("div");
+  private modalElement = createElementWithClass("div", css["modal-wrapper"]);
   private readonly typingEffect: TypingEffect;
 
   constructor(private readonly title: string) {
-    this.modalElement.className = css["modal-wrapper"];
     this.typingEffect = new TypingEffect({ text: this.title });
   }
 
@@ -29,8 +29,7 @@ export class Modal {
   render() {
     if (!this.visible) return;
 
-    const modalContent = document.createElement("div");
-    modalContent.className = css["modal-content"];
+    const modalContent = createElementWithClass("div", css["modal-content"]);
     modalContent.appendChild(this.typingEffect.render());
 
     this.modalElement.appendChild(modalContent);

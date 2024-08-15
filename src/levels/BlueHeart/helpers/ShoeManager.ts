@@ -13,15 +13,15 @@ import {
 import { animateWithTimer, lerp } from "@/utils/helpers/timing.helper.ts";
 
 export class ShoeManager {
-  private spriteYMap = new Map<PIXI.Sprite, number>();
-  private bottomOffset = 50;
-  private shoeSpacing = 20;
+  public readonly actButton = new ActButton();
   private shoeSpeed = 2.3;
-  private shoeWidth = 70;
-  private shoeHeight = 150;
-  public actButton = new ActButton();
-  private actButtonOffset = 20; // Offset for actButtonSprite to appear lower
   private verticalMoveDisabled: boolean = false;
+  private readonly bottomOffset = 50;
+  private readonly shoeSpacing = 20;
+  private readonly shoeWidth = 70;
+  private readonly shoeHeight = 150;
+  private readonly actButtonOffset = 20;
+  private readonly spriteYMap = new Map<PIXI.Sprite, number>();
 
   private readonly shoes: Sprite[] = [];
   private readonly defaultY: number;
@@ -50,9 +50,11 @@ export class ShoeManager {
       const shoe = new Shoe(x, y, shoeTexture);
       this.app.stage.addChild(shoe.container);
       this.shoes.push(shoe.container);
+
+      const movementCountDown = 500 * i + Math.random() * 500;
       setTimeout(() => {
         this.startVerticalMovement(shoe.container, this.bottomOffset);
-      }, 500 * i);
+      }, movementCountDown);
     }
 
     await this.createActButton();
@@ -121,9 +123,7 @@ export class ShoeManager {
 
     const moveTicker = createTicker();
     moveTicker.add(() => {
-      if (this.verticalMoveDisabled) {
-        return moveTicker.destroy();
-      }
+      if (this.verticalMoveDisabled) moveTicker.destroy();
 
       sprite.y += movingDown ? moveSpeed : -moveSpeed;
 

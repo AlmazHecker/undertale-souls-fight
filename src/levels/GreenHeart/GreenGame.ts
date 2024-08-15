@@ -15,7 +15,7 @@ export class GreenGame extends BaseGame {
     onFinish: () => void,
   ) {
     heart.maxHeightFromBottom = 300;
-    super(app, heart, health, onFinish);
+    super(app, heart, health, onFinish, -4);
     this.panManager = new PanManager(app, heart);
   }
 

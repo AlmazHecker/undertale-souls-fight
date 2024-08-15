@@ -3,6 +3,7 @@ import EventEmitter from "eventemitter3";
 import { Sound } from "@/config/Sound.ts";
 import healSnd from "@/assets/music/snd_heal_c.wav";
 import hurtSnd from "@/assets/music/snd_hurt.wav";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 interface Events {
   health: (points: number) => void;
@@ -12,8 +13,8 @@ export class Health extends EventEmitter<Events> {
   private readonly healSound = new Sound(healSnd);
   private readonly hurtSound = new Sound(hurtSnd);
 
-  public container = document.createElement("div");
-  public healthPoint = document.createElement("div");
+  public container = createElementWithClass("div", css["health-bar"]);
+  public healthPoint = createElementWithClass("div", css["health-point"]);
   constructor(
     public points = 20,
     public maxPoints = 20,
@@ -25,8 +26,6 @@ export class Health extends EventEmitter<Events> {
   async initialize() {
     await Promise.all([this.healSound.load(), this.hurtSound.load()]);
 
-    this.container.className = css["health-bar"];
-    this.healthPoint.className = css["health-point"];
     this.container.append(this.healthPoint);
   }
 
@@ -44,14 +43,16 @@ export class Health extends EventEmitter<Events> {
     this.emit("health", this.points);
   }
 
-  setHealthPoints(value: number) {
+  setHealthPoints(value: number, sound: boolean = true) {
     let val = this.points + value;
     const isHealing = value > 0;
 
-    if (isHealing) {
-      this.healSound.play();
-    } else {
-      this.hurtSound.play();
+    if (sound) {
+      if (isHealing) {
+        this.healSound.play();
+      } else {
+        this.hurtSound.play();
+      }
     }
 
     if (val > this.maxPoints) {
@@ -65,7 +66,6 @@ export class Health extends EventEmitter<Events> {
   }
 
   private calculateStyleWidth = () => {
-    const percentage = `${(this.points / this.maxPoints) * 100}%`;
-    this.healthPoint.style.width = percentage;
+    this.healthPoint.style.width = `${(this.points / this.maxPoints) * 100}%`;
   };
 }

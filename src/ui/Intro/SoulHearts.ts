@@ -1,10 +1,10 @@
-import "./SoulHearts.css";
+import css from "./SoulHearts.module.css";
 import { SOULS } from "@/utils/constants.ts";
 import HeartIcon from "@/assets/images/heart.svg?raw";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 const SoulHearts = () => {
-  const container = document.createElement("div");
-  container.className = "hearts";
+  const container = createElementWithClass("div", css.hearts);
 
   SOULS.map(() => {
     const item = document.createElement("div");

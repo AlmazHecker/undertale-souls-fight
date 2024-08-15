@@ -3,8 +3,3 @@
   position: relative;
   white-space: pre;
 }
-
-.cursor {
-  content: "|";
-  background: black;
-}

@@ -1,12 +1,13 @@
 import css from "./Button.module.css";
+import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 
 type ButtonProps = Partial<HTMLButtonElement> & {
   text: string;
 };
+
 const Button = (props: ButtonProps) => {
-  const button = document.createElement("button");
+  const button = createElementWithClass<"button">("button", css.button);
   button.textContent = props.text;
-  button.className = css.button;
 
   return button;
 };

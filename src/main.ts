@@ -9,5 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const { app, heart } = await initializePixi();
 
-  return new View(container, app, heart).initialize();
+  const view = new View(container, app, heart);
+  await view.initialize();
+  view.render();
 });

@@ -14,7 +14,7 @@ const animateElements = async (elements: HTMLCollection): Promise<boolean> => {
     let animationsCompleted = 0;
 
     const handleAnimation = (element: HTMLElement, index: number) => {
-      const originaTransition = getComputedStyle(element).transition;
+      const originalTransition = getComputedStyle(element).transition;
 
       const blink = () => {
         element.classList.add("blink");
@@ -44,7 +44,7 @@ const animateElements = async (elements: HTMLCollection): Promise<boolean> => {
 
       setTimeout(
         () => {
-          element.style.transition = originaTransition;
+          element.style.transition = originalTransition;
         },
         (index + 1) * (fadeInDuration + blinkDuration),
       );
@@ -63,7 +63,14 @@ const Intro = ({ nextView }: IntroProps) => {
   const hearts = SoulHearts();
   const button = Button({ text: "* START GAME" });
   button.style.margin = "0 auto";
-  button.onclick = async () => {
+
+  const enterListener = (event: KeyboardEvent) => {
+    return event.key === "Enter" && onButtonClick();
+  };
+  window.addEventListener("keydown", enterListener);
+
+  const onButtonClick = async () => {
+    window.removeEventListener("keydown", enterListener);
     button.disabled = true;
 
     const playBattleFallSound = await new Sound(battleFall).load();
@@ -72,6 +79,8 @@ const Intro = ({ nextView }: IntroProps) => {
     setTimeout(() => playBattleFallSound.play(), 300);
     setTimeout(nextView, 900);
   };
+
+  button.addEventListener("click", onButtonClick, { once: true });
 
   const container = document.createElement("div");
   container.append(hearts, button);
