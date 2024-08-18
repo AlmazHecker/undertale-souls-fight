@@ -81,6 +81,20 @@ export const arePolygonsColliding = (
   const polygonB = spriteB.hitArea as Polygon;
 
   if (!polygonA || !polygonB) return false;
+
+  const globalPositionA = spriteA.toGlobal(new Point(0, 0));
+  const globalPositionB = spriteB.toGlobal(new Point(0, 0));
+
+  const distanceSquared =
+    Math.pow(globalPositionA.x - globalPositionB.x, 2) +
+    Math.pow(globalPositionA.y - globalPositionB.y, 2);
+
+  // если два спрайта не на дистанции 150px, то возвращается false
+  // т.к они находятся слишком далеко и абсолютно никак не могут пересекаться
+  if (distanceSquared > Math.pow(150, 2)) {
+    return false;
+  }
+
   // Get global positions of the sprites
   const globalPointsA = [];
   const globalPointsB = [];
