@@ -10,8 +10,10 @@ export const initializePixi = async () => {
 
   let heart: Heart | undefined = undefined;
 
+
   await app.init({ width: 800, height: 500 });
 
+  
   if (import.meta.env.MODE === "development") {
     const winda = window as unknown as Record<string, unknown>;
     winda.__PIXI_APP__ = app;
@@ -20,6 +22,7 @@ export const initializePixi = async () => {
   }
   app.ticker.minFPS = 60;
   app.ticker.maxFPS = 60;
+
 
   heart = new Heart(app);
   heart.setup();
