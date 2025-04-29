@@ -26,7 +26,7 @@ export class Modal {
     }
   }
 
-  render() {
+  private render() {
     if (!this.visible) return;
 
     const modalContent = createElementWithClass("div", css["modal-content"]);

@@ -36,7 +36,7 @@ const animateElements = async (elements: HTMLCollection): Promise<boolean> => {
             setTimeout(blink, currentTime);
             currentTime += blinkDuration;
           },
-          index * (fadeInDuration + blinkDuration) + i * blinkDuration,
+          index * (fadeInDuration + blinkDuration) + i * blinkDuration
         );
       }
 
@@ -44,12 +44,12 @@ const animateElements = async (elements: HTMLCollection): Promise<boolean> => {
         () => {
           element.style.transition = originalTransition;
         },
-        (index + 1) * (fadeInDuration + blinkDuration),
+        (index + 1) * (fadeInDuration + blinkDuration)
       );
     };
 
     Array.from(elements).forEach((el, idx) =>
-      handleAnimation(el as HTMLElement, idx),
+      handleAnimation(el as HTMLElement, idx)
     );
   });
 };
@@ -58,6 +58,8 @@ type IntroProps = {
   nextView: () => void;
 };
 const Intro = ({ nextView }: IntroProps) => {
+  const controlsContainer = document.getElementById("controls-container")!;
+
   const hearts = SoulHearts();
   const button = Button({ text: "* START GAME" });
   button.style.margin = "0 auto";
@@ -69,6 +71,8 @@ const Intro = ({ nextView }: IntroProps) => {
 
   const onButtonClick = async () => {
     window.removeEventListener("keydown", enterListener);
+    controlsContainer.style.display = "none";
+
     button.disabled = true;
 
     const playBattleFallSound = SHARED_SOUNDS.battleFall;
@@ -79,6 +83,7 @@ const Intro = ({ nextView }: IntroProps) => {
   };
 
   button.addEventListener("click", onButtonClick, { once: true });
+  controlsContainer.style.display = "block";
 
   const container = document.createElement("div");
   container.append(hearts, button);
