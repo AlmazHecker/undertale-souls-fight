@@ -1,5 +1,5 @@
 # Undertale Souls Fight
-Gaizu, this is my first 2D game. It was inspirted by [Undertale, Souls Fight](https://www.youtube.com/watch?v=mLhVsOUIHMY&list=LL&index=83)<br/>
+Gaizu, this is my first 2D game. It was inspired by [Undertale, Souls Fight](https://www.youtube.com/watch?v=mLhVsOUIHMY&list=LL&index=83)<br/>
 Here's the [demo](https://almazhecker.github.io/undertale-souls-fight)
 
 ## Project Stack
