@@ -16,7 +16,7 @@ export class Health extends EventEmitter<Events> {
   public healthPoint = createElementWithClass("div", css["health-point"]);
   constructor(
     public points = 20,
-    public maxPoints = 20,
+    public maxPoints = 20
   ) {
     super();
     this.calculateStyleWidth();

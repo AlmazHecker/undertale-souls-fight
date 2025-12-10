@@ -29,7 +29,7 @@ export class View {
     private readonly container: HTMLElement,
     private readonly app: Application,
     private readonly heart: Heart,
-    private readonly audios: HTMLAudioElement[],
+    private readonly audios: HTMLAudioElement[]
   ) {}
 
   async initialize() {
@@ -56,7 +56,7 @@ export class View {
       this.app,
       this.heart,
       this.health,
-      this.nextView,
+      this.nextView
     );
     this.heart.container.x = this.app.renderer.width / 2;
     this.heart.container.y = this.app.renderer.height / 2;
@@ -80,12 +80,16 @@ export class View {
           this.currentLevel--;
           this.nextView();
         },
-      }),
+      })
     );
   };
 
   render() {
-    this.container.append(Intro({ nextView: this.nextView }));
-    return this.container;
+    // this.container.append(Intro({ nextView: this.nextView }));
+    // return this.container;
+    const btn = document.createElement("button");
+    btn.textContent = "Next View";
+    btn.onclick = this.nextView;
+    this.container.appendChild(btn);
   }
 }
