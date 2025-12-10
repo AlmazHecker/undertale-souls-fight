@@ -32,7 +32,6 @@ export const animateWithTimer = (
     };
 
     ticker.add(animate);
-    ticker.start();
   });
 };
 

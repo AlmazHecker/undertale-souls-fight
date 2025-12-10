@@ -5,11 +5,15 @@ import { Heart } from "./Heart.ts";
 import { animateWithTimer } from "../helpers/timing.helper.ts";
 import { arePolygonsColliding } from "../helpers/pixi.helper.ts";
 import actPng from "@/assets/images/act.png";
+import { GLOBAL_SCALE } from "@/config/engine.ts";
 
 export class ActButton extends BaseItem {
   constructor(texture?: Texture, x = 0, y = 0) {
+    const scaledW = 140;
+    const scaledH = 50;
+
     const actButtonSprite = new Sprite(texture);
-    super(actButtonSprite, x, y, 140, 50);
+    super(actButtonSprite, x, y, scaledW, scaledH);
 
     this.container.tint = "#dc8a51";
     this.container.visible = false;
@@ -17,6 +21,7 @@ export class ActButton extends BaseItem {
     this.container._zIndex = 5;
     this.container.hitArea = this.toPolygon(svgPolygon);
     this.container.label = "act-button";
+    this.container.scale.set(GLOBAL_SCALE);
   }
 
   public async initialize() {

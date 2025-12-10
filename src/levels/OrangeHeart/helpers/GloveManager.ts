@@ -18,19 +18,26 @@ import {
   getGlobalTicker,
 } from "@/utils/helpers/pixi.helper.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
+import { GLOBAL_SCALE as SC, HEIGHT, WIDTH } from "@/config/engine.ts";
+
+const GLOBAL_SCALE = SC * 1.2;
 
 export class GloveManager {
   public actButton = new ActButton();
   public gloveContainers: PIXI.Container<Sprite>[] = Array.from(
-    { length: 6 },
+    { length: 9 },
     () => new PIXI.Container()
   );
-  private minRadius = 50;
-  private maxRadius = 120;
+  private minRadius = 100 * GLOBAL_SCALE;
+  private maxRadius = 200 * GLOBAL_SCALE;
   private rotationSpeed = 0.007;
-  private ticker = getGlobalTicker();
   private stop: boolean = false;
   private likeTexture!: Texture;
+  private rowSpacing!: number;
+  private columnHeight!: number;
+
+  private numColumns = 3;
+  private numRows = 3;
 
   constructor(
     private readonly app: Application,
@@ -46,41 +53,40 @@ export class GloveManager {
     const numSprites = 7;
     const angleStep = (2 * Math.PI) / numSprites;
 
-    const screenWidth = this.app.renderer.width;
-    const screenHeight = this.app.renderer.height;
-
-    const numColumns = 3;
-    const numRows = 3;
     const containerWidth = 0;
-    const containerHeight = -350;
+    const containerHeight = -350 * GLOBAL_SCALE;
 
-    const totalGridWidth = numColumns + containerWidth;
-    const totalGridHeight = numRows + containerHeight;
+    const totalGridWidth = this.numColumns + containerWidth;
+    const totalGridHeight = this.numRows + containerHeight;
 
-    const offsetX = (screenWidth - totalGridWidth) / 2;
-    const offsetY = (screenHeight - totalGridHeight) / 2;
+    const offsetX = (WIDTH - totalGridWidth) / 2;
+    const offsetY = (HEIGHT - totalGridHeight) / 2;
 
     for (let i = 0; i < this.gloveContainers.length; i++) {
       const container = this.gloveContainers[i];
 
-      const row = Math.floor(i / numColumns);
-      const column = i % numColumns;
+      const row = Math.floor(i / this.numColumns);
+      const column = i % this.numColumns;
 
-      const y = row * offsetY + (column === 1 ? 250 : 150);
+      const y = row * offsetY + 100;
       const x = column * offsetX;
 
       container.x = x;
       container.y = y;
       container.label = `${column}`;
 
+      this.rowSpacing = offsetY;
+      this.columnHeight = this.rowSpacing * this.numRows;
+
       for (let j = 0; j < numSprites; j++) {
         const angle = j * angleStep;
 
         const glove = new Glove({ texture: assets.glove });
-
         const sprite = glove.container;
 
-        sprite.pivot.set(sprite.width / 2, sprite.height);
+        glove.centerWithPivot();
+        glove.container.scale.set(GLOBAL_SCALE);
+
         sprite.rotation = angle + Math.PI / 2;
 
         sprite.label = `${i}`;
@@ -89,9 +95,9 @@ export class GloveManager {
       }
 
       this.animateRadius(container);
-      this.animateContainerRotation(container);
       this.app.stage.addChild(container);
     }
+    getGlobalTicker().add(this.animateContainersRotation, this);
     return this.createActButton();
   }
 
@@ -104,8 +110,8 @@ export class GloveManager {
     ) => {
       await animateWithTimer(
         duration,
-        (progress) => {
-          if (this.stop) return;
+        (progress, destroy) => {
+          if (this.stop) return destroy();
           const angleStep = (2 * Math.PI) / 7;
 
           const currentRadius = lerp(startRadius, endRadius, progress);
@@ -125,20 +131,23 @@ export class GloveManager {
       await animateRadiusChange(this.maxRadius, this.minRadius);
     }, !this.stop);
   }
+  animateContainersRotation() {
+    const screenH = this.app.renderer.height;
 
-  animateContainerRotation(container: PIXI.Container) {
-    this.ticker.add(() => {
+    this.gloveContainers.forEach((container) => {
       container.rotation += this.rotationSpeed;
       if (container.rotation >= 2 * Math.PI) {
         container.rotation -= 2 * Math.PI;
       }
+
       container.y += 1;
 
-      if (container.y - this.maxRadius > this.app.renderer.height) {
-        container.y = -container.height;
+      const visualTop = container.y - this.maxRadius;
+
+      if (visualTop > screenH) {
+        container.y -= this.columnHeight;
       }
     });
-    this.ticker.start();
   }
 
   public checkCollisions() {
@@ -187,6 +196,7 @@ export class GloveManager {
         if (glove.label === "act-button") return;
         glove.hitArea = new Polygon(LIKE_POLYGON);
         glove.texture = this.likeTexture;
+        glove.scale.set(GLOBAL_SCALE);
 
         glove.tint = "#07a108";
       });
@@ -194,8 +204,8 @@ export class GloveManager {
   }
 
   destroy() {
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.animateContainersRotation, this);
+
     this.app.stage.removeChild(...this.gloveContainers);
     this.gloveContainers.forEach((c) => c.destroy());
     this.stop = true;

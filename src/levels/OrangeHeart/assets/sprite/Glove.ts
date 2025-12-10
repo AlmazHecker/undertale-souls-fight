@@ -3,10 +3,14 @@ import { BaseItem } from "@/core/BaseItem.ts";
 import { ItemOptions } from "@/utils/types.ts";
 
 export class Glove extends BaseItem {
+  public static width = 104;
+  public static height = 125;
+
   constructor(options: ItemOptions) {
     const sprite = new PIXI.Sprite(options.texture);
-    super(sprite, options.x, options.y, options.width, options.height);
+    super(sprite, options.x, options.y, Glove.width, Glove.height);
     this.container._zIndex = 2;
+    console.log(options.texture);
 
     this.container.hitArea = this.toPolygon(GLOVE_POLYGON);
   }

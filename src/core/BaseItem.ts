@@ -6,7 +6,7 @@ export class BaseItem<T extends Sprite | Graphics = Sprite> {
     x?: number,
     y?: number,
     width?: number,
-    height?: number,
+    height?: number
   ) {
     if (x) this.container.x = x;
     if (y) this.container.y = y;
