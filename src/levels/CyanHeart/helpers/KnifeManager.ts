@@ -10,6 +10,7 @@ import { animateWithTimer } from "@/utils/helpers/timing.helper.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { Knife } from "@/levels/CyanHeart/assets/sprite/Knife.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
+import { GLOBAL_SCALE } from "@/config/engine";
 
 export class KnifeManager {
   public actButton = new ActButton();
@@ -26,7 +27,7 @@ export class KnifeManager {
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
-    private readonly actButtonCountDown: number,
+    private readonly actButtonCountDown: number
   ) {}
 
   async initialize() {
@@ -35,23 +36,28 @@ export class KnifeManager {
     const assets = await Assets.loadBundle("cyan");
     this.plasterTexture = assets.plaster;
 
-    const numKnivesX = Math.ceil(
-      this.app.renderer.width / (128 + this.knifeSpacing),
-    );
+    const KNIFE_SIZE = Knife.width * GLOBAL_SCALE;
+    const SPACING = this.knifeSpacing * GLOBAL_SCALE;
+
+    const MAX_X = 8;
+
     const numKnivesY = Math.ceil(
-      this.app.renderer.height / (128 + this.knifeSpacing),
+      this.app.renderer.height / (KNIFE_SIZE + SPACING)
     );
-    for (let y = 0; y <= numKnivesY; y++) {
-      for (let x = 0; x <= numKnivesX; x++) {
+
+    for (let y = 0; y < numKnivesY; y++) {
+      for (let x = 0; x < MAX_X; x++) {
         const knife = new Knife(
           assets.knife,
-          x * (128 + this.knifeSpacing),
-          y * (128 + this.knifeSpacing),
+          x * (KNIFE_SIZE + SPACING),
+          y * (KNIFE_SIZE + SPACING)
         );
 
+        knife.container.scale.set(GLOBAL_SCALE);
         this.knifeContainer.addChild(knife.container);
       }
     }
+
     this.app.stage.addChild(this.knifeContainer);
 
     this.startRhombusMovement();
@@ -120,7 +126,7 @@ export class KnifeManager {
 
     do {
       const index = Math.floor(
-        Math.random() * this.knifeContainer.children.length,
+        Math.random() * this.knifeContainer.children.length
       );
       knife = this.knifeContainer.children[index];
     } while (isOutOfCanvas(knife, this.app));

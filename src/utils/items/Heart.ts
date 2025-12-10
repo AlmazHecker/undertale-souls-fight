@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
 import { Graphics, Ticker } from "pixi.js";
-
 import { BaseItem } from "@/core/BaseItem.ts";
 import { KeyboardHandler } from "../helpers/mover.helper.ts";
 import { createTicker } from "../helpers/pixi.helper.ts";
+import { GLOBAL_SCALE, HEIGHT, WIDTH } from "@/config/engine.ts";
 
 const svgPath = [
   24, 8, 24, 6, 22, 6, 22, 4, 20, 4, 20, 6, 18, 6, 18, 8, 16, 8, 16, 10, 14, 10,
@@ -12,111 +12,97 @@ const svgPath = [
   20, 22, 22, 22, 22, 20, 24, 20, 24, 18, 26, 18, 26, 8,
 ];
 
-export class Heart extends BaseItem<Graphics & { vx: number; vy: number }> {
+export class Heart extends BaseItem<Graphics> {
   public maxHeightFromBottom: number = 0;
+  private ticker: Ticker = createTicker();
+  private blinkInterval?: ReturnType<typeof setInterval>;
   public keyboardHandler: KeyboardHandler;
 
-  private app: PIXI.Application;
-  private ticker: Ticker = createTicker();
-  private blinkInterval: ReturnType<typeof setInterval> | undefined; // Blink interval
+  private polygon: PIXI.Polygon;
 
-  constructor(app: PIXI.Application, maxHeightFromBottom: number = 0) {
-    const graphics = new Graphics() as Graphics & { vx: number; vy: number };
-    const x = app.renderer.width / 2;
-    const y = app.renderer.height / 2;
-    graphics.fill("red");
-    super(graphics, x, y);
+  constructor(maxHeightFromBottom = 0) {
+    const graphics = new Graphics();
+    super(graphics, WIDTH / 2, HEIGHT / 2);
 
-    const heartPolygon = this.toPolygon(svgPath);
-    this.container.poly(heartPolygon.points);
-    this.app = app;
-
-    this.container.fill("red");
-    this.container.height = 25;
-    this.container.width = 25;
-    this.container._zIndex = 10;
-
-    this.centerWithPivot();
-
-    this.container.hitArea = heartPolygon;
     this.maxHeightFromBottom = maxHeightFromBottom;
 
     this.keyboardHandler = new KeyboardHandler();
     this.keyboardHandler.setup();
+
+    this.polygon = this.toPolygon(svgPath);
+
+    this.initGraphics();
+    this.centerWithPivot();
+    this.container.hitArea = this.polygon;
   }
 
-  public updatePosition(delta: number) {
-    this.container.x += this.container.vx * delta;
-    this.container.y += this.container.vy * delta;
-    if (this.container.x < this.container.width / 2) {
-      this.container.x = this.container.width / 2;
-    }
-    if (this.container.x > this.app.renderer.width - this.container.width / 2) {
-      this.container.x = this.app.renderer.width - this.container.width / 2;
-    }
-    if (this.container.y < this.container.height / 2) {
-      this.container.y = this.container.height / 2;
-    }
-
-    if (
-      this.maxHeightFromBottom !== 0 &&
-      this.container.y < this.app.renderer.height - this.maxHeightFromBottom
-    ) {
-      // Constrain to max height from bottom
-      this.container.y = this.app.renderer.height - this.maxHeightFromBottom;
-    }
-    if (
-      this.container.y >
-      this.app.renderer.height - this.container.height / 2
-    ) {
-      this.container.y = this.app.renderer.height - this.container.height / 2;
-    }
+  private initGraphics() {
+    this.container.poly(this.polygon.points);
+    this.container.fill("red");
+    this.container.scale.set(GLOBAL_SCALE);
+    this.container._zIndex = 10;
   }
 
-  public setVelocity(vx: number, vy: number) {
-    this.container.vx = vx;
-    this.container.vy = vy;
+  private handleMovement(delta: number) {
+    let dx = 0;
+    let dy = 0;
+    const keyState = this.keyboardHandler.keyState;
+    const speed = 3 * GLOBAL_SCALE;
+
+    if (keyState.ArrowLeft) dx -= speed;
+    if (keyState.ArrowRight) dx += speed;
+    if (keyState.ArrowUp) dy -= speed;
+    if (keyState.ArrowDown) dy += speed;
+
+    this.updatePosition(dx * delta, dy * delta);
   }
 
-  public startBlinking() {
-    let isRed = true;
+  public updatePosition(dx: number, dy: number) {
+    const { container } = this;
+    container.x = Math.max(
+      container.width / 2,
+      Math.min(container.x + dx, WIDTH - container.width / 2)
+    );
+
+    let minY = container.height / 2;
+    if (this.maxHeightFromBottom > 0) {
+      minY = Math.max(minY, HEIGHT - this.maxHeightFromBottom);
+    }
+    container.y = Math.max(
+      minY,
+      Math.min(container.y + dy, HEIGHT - container.height / 2)
+    );
+  }
+
+  public startBlinking(duration = 1000, interval = 100) {
+    let isRed = false;
     this.blinkInterval = setInterval(() => {
-      this.container.clear().poly(this.toPolygon(svgPath).points || []);
-      this.container.fill(isRed ? "red" : "transparent");
+      this.redrawBlink(isRed);
       isRed = !isRed;
-    }, 100);
+    }, interval);
 
     setTimeout(() => {
       clearInterval(this.blinkInterval);
-      this.container.clear().poly(this.toPolygon(svgPath).points || []);
-      this.container.fill("red");
-    }, 1000);
+      this.redrawBlink(true);
+    }, duration);
   }
 
-  setup() {
-    this.ticker.add((delta) => {
-      handleMovement(delta);
-    });
+  private redrawBlink(isRed?: boolean) {
+    this.container.clear();
+    this.container.poly(this.polygon.points);
+    this.container.fill(isRed ? "red" : "transparent");
+  }
 
+  public setup() {
+    this.ticker.add((ticker) => this.handleMovement(ticker.deltaTime));
     this.ticker.start();
-    const handleMovement = (ticker: PIXI.Ticker) => {
-      let vx = 0;
-      let vy = 0;
-      const keyState = this.keyboardHandler.keyState;
-
-      if (keyState.ArrowLeft) vx -= 3;
-      if (keyState.ArrowRight) vx += 3;
-      if (keyState.ArrowUp) vy -= 3;
-      if (keyState.ArrowDown) vy += 3;
-
-      this.setVelocity(vx, vy);
-      this.updatePosition(ticker.deltaTime);
-    };
   }
 
-  destroy() {
+  public destroy() {
     this.keyboardHandler.cleanup();
     this.ticker.stop();
     this.ticker.destroy();
+
+    if (this.blinkInterval) clearInterval(this.blinkInterval);
   }
 }

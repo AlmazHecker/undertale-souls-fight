@@ -5,6 +5,11 @@ import { PIXI_ASSETS_MANIFEST } from "@/utils/constants.ts";
 
 export const GAME_CONTAINER = "game-container";
 
+export const WIDTH = window.innerWidth;
+export const HEIGHT = window.innerHeight;
+
+export const GLOBAL_SCALE = Math.min(WIDTH / 800, HEIGHT / 600);
+
 export const initializePixi = async () => {
   let app: PIXI.Application | undefined = new PIXI.Application();
 
@@ -12,8 +17,8 @@ export const initializePixi = async () => {
 
   await app.init({
     resizeTo: window,
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: WIDTH,
+    height: HEIGHT,
   });
 
   app.canvas.style.width = "100%";
@@ -28,7 +33,7 @@ export const initializePixi = async () => {
   app.ticker.minFPS = 60;
   app.ticker.maxFPS = 60;
 
-  heart = new Heart(app);
+  heart = new Heart();
   heart.setup();
   app.stage.addChild(heart.container);
 

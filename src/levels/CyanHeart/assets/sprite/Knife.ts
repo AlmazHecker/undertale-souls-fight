@@ -2,9 +2,12 @@ import * as PIXI from "pixi.js";
 import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Knife extends BaseItem {
+  public static width = 128;
+  public static height = 36;
+
   constructor(texture: PIXI.Texture, x: number, y: number) {
     const sprite = new PIXI.Sprite(texture);
-    super(sprite, x, y, 128, 36);
+    super(sprite, x, y, Knife.width, Knife.height);
     this.container._zIndex = 1;
 
     this.centerWithPivot();

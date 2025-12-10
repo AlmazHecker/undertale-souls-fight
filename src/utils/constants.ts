@@ -3,6 +3,7 @@ import shoePng from "@/levels/BlueHeart/assets/img/shoe.png";
 import starPng from "@/levels/BlueHeart/assets/img/star.png";
 import musicPng from "@/levels/BlueHeart/assets/img/music.png";
 import knifePng from "@/levels/CyanHeart/assets/img/knife.png";
+// import knifePng from "@/levels/CyanHeart/assets/img/knife.svg";
 import plasterPng from "@/levels/CyanHeart/assets/img/plaster.png";
 import glovePng from "@/levels/OrangeHeart/assets/img/glove.png";
 import likePng from "@/levels/OrangeHeart/assets/img/like.png";
@@ -17,7 +18,6 @@ import heartAimPng from "@/levels/YellowHeart/assets/img/heart-aim.png";
 import flowerPng from "@/levels/YellowHeart/assets/img/flower.png";
 
 export const PIXI_ASSETS_MANIFEST: AssetsManifest = {
-
   bundles: [
     {
       name: "blue",
@@ -26,7 +26,6 @@ export const PIXI_ASSETS_MANIFEST: AssetsManifest = {
         { alias: "star", src: starPng, data: { scaleMode: "nearest" } },
         { alias: "music", src: musicPng, data: { scaleMode: "nearest" } },
       ],
-
     },
     {
       name: "cyan",
@@ -44,8 +43,7 @@ export const PIXI_ASSETS_MANIFEST: AssetsManifest = {
     },
     {
       name: "purple",
-      assets: [
-        { alias: "note", src: notePng, data: { scaleMode: "nearest" } }],
+      assets: [{ alias: "note", src: notePng, data: { scaleMode: "nearest" } }],
     },
     {
       name: "green",
@@ -60,7 +58,11 @@ export const PIXI_ASSETS_MANIFEST: AssetsManifest = {
       assets: [
         { alias: "pistol", src: pistolPng, data: { scaleMode: "nearest" } },
         { alias: "bullet", src: bulletPng, data: { scaleMode: "nearest" } },
-        { alias: "pistolAim", src: pistolAimPng, data: { scaleMode: "nearest" } },
+        {
+          alias: "pistolAim",
+          src: pistolAimPng,
+          data: { scaleMode: "nearest" },
+        },
         { alias: "heartAim", src: heartAimPng, data: { scaleMode: "nearest" } },
         { alias: "flower", src: flowerPng, data: { scaleMode: "nearest" } },
       ],
