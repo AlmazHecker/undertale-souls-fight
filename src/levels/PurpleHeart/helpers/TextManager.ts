@@ -3,7 +3,7 @@ import { Application, Container, Sprite } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
 import {
   areRectanglesColliding,
-  createTicker,
+  getGlobalTicker,
 } from "@/utils/helpers/pixi.helper.ts";
 
 import {
@@ -31,20 +31,20 @@ export class TextManager {
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
-    private readonly actButtonCountDown: number,
+    private readonly actButtonCountDown: number
   ) {}
 
   async initialize() {
     await this.actButton.initialize();
     const numTextsY = Math.ceil(
-      this.app.renderer.height / (this.textHeight + 10),
+      this.app.renderer.height / (this.textHeight + 10)
     );
 
     for (let y = 0; y <= numTextsY; y++) {
       const text = new Text(
         this.activeWords[getRandomIndex(this.activeWords)],
         0,
-        y * (this.textHeight + this.textSpacing),
+        y * (this.textHeight + this.textSpacing)
       );
 
       this.yAxis.push(text.text.y);
@@ -101,7 +101,7 @@ export class TextManager {
     const endX = this.app.screen.width - 200;
     let movingRight = getRandomBoolean();
 
-    const moveTicker = createTicker();
+    const moveTicker = getGlobalTicker();
 
     moveTicker.add(() => {
       if (this.stop) return moveTicker.stop();

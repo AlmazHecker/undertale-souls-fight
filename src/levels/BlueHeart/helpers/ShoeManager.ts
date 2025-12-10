@@ -7,7 +7,7 @@ import { Shoe } from "../assets/sprite/Shoe.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 import {
   arePolygonsColliding,
-  createTicker,
+  getGlobalTicker,
 } from "@/utils/helpers/pixi.helper.ts";
 import { animateWithTimer, lerp } from "@/utils/helpers/timing.helper.ts";
 
@@ -28,7 +28,7 @@ export class ShoeManager {
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
-    private readonly actButtonCountDown: number,
+    private readonly actButtonCountDown: number
   ) {
     this.defaultY =
       this.app.renderer.height - this.shoeHeight - this.bottomOffset;
@@ -40,7 +40,7 @@ export class ShoeManager {
 
     const numShoesX =
       Math.floor(
-        this.app.renderer.width / (this.shoeWidth + this.shoeSpacing),
+        this.app.renderer.width / (this.shoeWidth + this.shoeSpacing)
       ) + 1;
 
     for (let i = 0; i < numShoesX; i++) {
@@ -121,7 +121,7 @@ export class ShoeManager {
     const moveSpeed = 1.5;
     let movingDown = true;
 
-    const moveTicker = createTicker();
+    const moveTicker = getGlobalTicker();
     moveTicker.add(() => {
       if (this.verticalMoveDisabled) moveTicker.destroy();
 

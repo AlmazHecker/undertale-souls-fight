@@ -1,15 +1,15 @@
 import { Container, Text, Ticker } from "pixi.js";
 import { getRandomInRange } from "./random.helper.ts";
-import { createTicker } from "./pixi.helper.ts";
+import { getGlobalTicker } from "./pixi.helper.ts";
 
 export const animateWithTimer = (
   duration: number,
   onUpdate: (progress: number, destroy: () => void) => void,
-  easingFunction: (t: number) => number = (t) => t,
+  easingFunction: (t: number) => number = (t) => t
 ) => {
   return new Promise<void>((resolve) => {
     let startTime: number | null = null;
-    const ticker = createTicker();
+    const ticker = getGlobalTicker();
 
     const destroyLoop = () => {
       ticker.remove(animate);
@@ -70,14 +70,14 @@ export const vibrate = async ({
       const offsetY = getRandomInRange(-3, 3);
       container.y = Math.max(
         y - intensity,
-        Math.min(y + intensity, container.y + offsetY),
+        Math.min(y + intensity, container.y + offsetY)
       );
     }
     if (x) {
       const offsetX = getRandomInRange(-3, 3);
       container.x = Math.max(
         x - intensity,
-        Math.min(x + intensity, container.x + offsetX),
+        Math.min(x + intensity, container.x + offsetX)
       );
     }
   });
@@ -85,7 +85,7 @@ export const vibrate = async ({
 
 export const callInfinitely = async (
   func: () => Promise<void>,
-  condition: boolean,
+  condition: boolean
 ) => {
   while (condition) {
     await func();

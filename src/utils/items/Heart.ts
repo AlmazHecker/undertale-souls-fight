@@ -2,8 +2,8 @@ import * as PIXI from "pixi.js";
 import { Graphics, Ticker } from "pixi.js";
 import { BaseItem } from "@/core/BaseItem.ts";
 import { KeyboardHandler } from "../helpers/mover.helper.ts";
-import { createTicker } from "../helpers/pixi.helper.ts";
 import { GLOBAL_SCALE, HEIGHT, WIDTH } from "@/config/engine.ts";
+import { getGlobalTicker } from "../helpers/pixi.helper.ts";
 
 const svgPath = [
   24, 8, 24, 6, 22, 6, 22, 4, 20, 4, 20, 6, 18, 6, 18, 8, 16, 8, 16, 10, 14, 10,
@@ -14,7 +14,6 @@ const svgPath = [
 
 export class Heart extends BaseItem<Graphics> {
   public maxHeightFromBottom: number = 0;
-  private ticker: Ticker = createTicker();
   private blinkInterval?: ReturnType<typeof setInterval>;
   public keyboardHandler: KeyboardHandler;
 
@@ -43,7 +42,8 @@ export class Heart extends BaseItem<Graphics> {
     this.container._zIndex = 10;
   }
 
-  private handleMovement(delta: number) {
+  private handleMovement(ticker: Ticker) {
+    const delta = ticker.deltaTime;
     let dx = 0;
     let dy = 0;
     const keyState = this.keyboardHandler.keyState;
@@ -94,15 +94,15 @@ export class Heart extends BaseItem<Graphics> {
   }
 
   public setup() {
-    this.ticker.add((ticker) => this.handleMovement(ticker.deltaTime));
-    this.ticker.start();
+    const globalTicker = getGlobalTicker();
+    globalTicker.add((ticker) => this.handleMovement(ticker));
   }
 
   public destroy() {
     this.keyboardHandler.cleanup();
-    this.ticker.stop();
-    this.ticker.destroy();
 
+    const ticker = getGlobalTicker();
+    ticker.remove(this.handleMovement, this);
     if (this.blinkInterval) clearInterval(this.blinkInterval);
   }
 }

@@ -6,6 +6,7 @@ import { StarManager } from "./helpers/StarManager.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
+import { getGlobalTicker } from "@/utils/helpers/pixi.helper.ts";
 
 export class BlueGame extends BaseGame {
   private shoeManager: ShoeManager;
@@ -15,7 +16,7 @@ export class BlueGame extends BaseGame {
     app: PIXI.Application,
     heart: Heart,
     health: Health,
-    onFinish: () => void,
+    onFinish: () => void
   ) {
     super(app, heart, health, onFinish);
     this.shoeManager = new ShoeManager(app, heart, 10000);
@@ -30,21 +31,19 @@ export class BlueGame extends BaseGame {
   async initialize() {
     await this.shoeManager.initialize();
     await this.starManager.initialize();
-    this.startGameLoop();
 
-    this.ticker.start();
+    getGlobalTicker().add(this.startGameLoop, this);
+
     return this;
   }
 
   startGameLoop() {
-    this.ticker.add(() => {
-      const collisions = this.checkCollisions();
-      if (this.status === "HELPING") {
-        this.handleHeal(collisions);
-      } else {
-        this.handleDamage(collisions);
-      }
-    });
+    const collisions = this.checkCollisions();
+    if (this.status === "HELPING") {
+      this.handleHeal(collisions);
+    } else {
+      this.handleDamage(collisions);
+    }
   }
 
   handleHeal(collisions: Sprite[]) {
@@ -82,7 +81,6 @@ export class BlueGame extends BaseGame {
   destroy(): Promise<void> | void {
     this.shoeManager.destroy();
     this.starManager.destroy();
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.startGameLoop, this);
   }
 }

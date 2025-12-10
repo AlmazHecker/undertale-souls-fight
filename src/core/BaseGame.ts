@@ -1,7 +1,6 @@
-import { Application, Container, Ticker } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import EventEmitter from "eventemitter3";
 import { Heart } from "../utils/items/Heart.ts";
-import { createTicker } from "../utils/helpers/pixi.helper.ts";
 import { Health } from "@/ui/Health/Health.ts";
 
 interface GameEvents {
@@ -20,7 +19,6 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
   public status: GameLifeCycle = "IDLE";
   public isBtnAndHeartColliding = false;
 
-  protected ticker: Ticker;
   private collisionCooldown = false;
 
   protected constructor(
@@ -31,7 +29,6 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
     private readonly damage: number = -3
   ) {
     super();
-    this.ticker = createTicker();
     this.app.renderer.clear({ clear: true });
     this.on("status", this.statusListener, this);
   }

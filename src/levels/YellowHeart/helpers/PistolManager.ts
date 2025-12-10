@@ -3,7 +3,7 @@ import { Application, Assets, Sprite, Texture } from "pixi.js";
 
 import {
   arePolygonsColliding,
-  createTicker,
+  getGlobalTicker,
   isOutOfCanvas,
 } from "@/utils/helpers/pixi.helper.ts";
 import {
@@ -32,7 +32,7 @@ export class PistolManager {
 
   constructor(
     private readonly app: Application,
-    private readonly heart: Heart,
+    private readonly heart: Heart
   ) {}
 
   async initialize() {
@@ -141,7 +141,7 @@ export class PistolManager {
     await sleep(this.bulletSleep);
     const bullet = this.createBullet(
       this.pistol.container.x,
-      this.pistol.container.y,
+      this.pistol.container.y
     );
     this.setBulletTrajectory(bullet, pistolAim);
 
@@ -158,7 +158,7 @@ export class PistolManager {
     bullet.container.rotation = angle;
 
     const speed = 10;
-    const ticker = createTicker();
+    const ticker = getGlobalTicker();
 
     ticker.add(() => {
       bullet.container.x += Math.cos(angle) * speed;

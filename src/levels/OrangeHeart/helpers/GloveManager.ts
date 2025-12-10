@@ -15,7 +15,7 @@ import {
 import { Glove, LIKE_POLYGON } from "../assets/sprite/Glove.ts";
 import {
   arePolygonsColliding,
-  createTicker,
+  getGlobalTicker,
 } from "@/utils/helpers/pixi.helper.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
 
@@ -23,19 +23,19 @@ export class GloveManager {
   public actButton = new ActButton();
   public gloveContainers: PIXI.Container<Sprite>[] = Array.from(
     { length: 6 },
-    () => new PIXI.Container(),
+    () => new PIXI.Container()
   );
   private minRadius = 50;
   private maxRadius = 120;
   private rotationSpeed = 0.007;
-  private ticker = createTicker();
+  private ticker = getGlobalTicker();
   private stop: boolean = false;
   private likeTexture!: Texture;
 
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
-    private readonly actButtonCountDown: number,
+    private readonly actButtonCountDown: number
   ) {}
 
   async initialize() {
@@ -100,7 +100,7 @@ export class GloveManager {
 
     const animateRadiusChange = async (
       startRadius: number,
-      endRadius: number,
+      endRadius: number
     ) => {
       await animateWithTimer(
         duration,
@@ -116,7 +116,7 @@ export class GloveManager {
             glove.y = currentRadius * Math.sin(angle);
           });
         },
-        easeInOut,
+        easeInOut
       );
     };
 
@@ -173,7 +173,7 @@ export class GloveManager {
   private createActButton() {
     const randomContainerIndex = getRandomBoolean() ? 1 : 4;
     this.gloveContainers[randomContainerIndex].addChild(
-      this.actButton.container,
+      this.actButton.container
     );
 
     setTimeout(() => {

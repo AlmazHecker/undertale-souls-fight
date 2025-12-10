@@ -4,6 +4,7 @@ import { Heart } from "@/utils/items/Heart.ts";
 import { Health } from "@/ui/Health/Health.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { GloveManager } from "./helpers/GloveManager.ts";
+import { getGlobalTicker } from "@/utils/helpers/pixi.helper.ts";
 
 export class OrangeGame extends BaseGame {
   private gloveManager: GloveManager;
@@ -12,7 +13,7 @@ export class OrangeGame extends BaseGame {
     app: PIXI.Application,
     heart: Heart,
     health: Health,
-    onFinish: () => void,
+    onFinish: () => void
   ) {
     super(app, heart, health, onFinish);
     this.gloveManager = new GloveManager(app, heart, 10000);
@@ -21,27 +22,24 @@ export class OrangeGame extends BaseGame {
   async initialize() {
     await this.gloveManager.initialize();
     this.app.stage.addChild(this.heart.container);
-    this.startGameLoop();
 
-    this.ticker.start();
+    getGlobalTicker().add(this.startGameLoop, this);
     return this;
   }
 
   startGameLoop() {
-    this.ticker.add(() => {
-      const collisions = this.gloveManager.checkCollisions();
+    const collisions = this.gloveManager.checkCollisions();
 
-      if (this.gloveManager.actButton) {
-        this.isBtnAndHeartColliding =
-          this.gloveManager.actButton.isCollidingWithHeart(this.heart);
-      }
+    if (this.gloveManager.actButton) {
+      this.isBtnAndHeartColliding =
+        this.gloveManager.actButton.isCollidingWithHeart(this.heart);
+    }
 
-      if (this.status === "HELPING") {
-        this.handleHeal(collisions);
-      } else {
-        this.handleDamage(collisions);
-      }
-    });
+    if (this.status === "HELPING") {
+      this.handleHeal(collisions);
+    } else {
+      this.handleDamage(collisions);
+    }
   }
 
   handleHeal(collisions: Sprite[]) {
@@ -63,8 +61,7 @@ export class OrangeGame extends BaseGame {
 
   destroy(): Promise<void> | void {
     this.gloveManager.destroy();
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.startGameLoop, this);
   }
 
   preparingHelp() {}

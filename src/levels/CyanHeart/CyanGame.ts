@@ -5,6 +5,7 @@ import { Heart } from "@/utils/items/Heart.ts";
 import { KnifeManager } from "./helpers/KnifeManager.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
+import { getGlobalTicker } from "@/utils/helpers/pixi.helper.ts";
 
 export class CyanGame extends BaseGame {
   private knifeManager: KnifeManager;
@@ -13,7 +14,7 @@ export class CyanGame extends BaseGame {
     app: PIXI.Application,
     heart: Heart,
     health: Health,
-    onFinish: () => void,
+    onFinish: () => void
   ) {
     super(app, heart, health, onFinish);
     this.knifeManager = new KnifeManager(app, heart, 10000);
@@ -22,24 +23,23 @@ export class CyanGame extends BaseGame {
   async initialize() {
     await this.knifeManager.initialize();
     this.app.stage.addChild(this.heart.container);
+
+    getGlobalTicker().add(this.startGameLoop, this);
     this.startGameLoop();
 
-    this.ticker.start();
     return this;
   }
 
   startGameLoop() {
-    this.ticker.add(() => {
-      const collisions = this.knifeManager.infiniteKnivesAnimation();
-      this.isBtnAndHeartColliding =
-        this.knifeManager.actButton.isCollidingWithHeart(this.heart);
+    const collisions = this.knifeManager.infiniteKnivesAnimation();
+    this.isBtnAndHeartColliding =
+      this.knifeManager.actButton.isCollidingWithHeart(this.heart);
 
-      if (this.status === "HELPING") {
-        this.handleHeal(collisions);
-      } else {
-        this.handleDamage(collisions);
-      }
-    });
+    if (this.status === "HELPING") {
+      this.handleHeal(collisions);
+    } else {
+      this.handleDamage(collisions);
+    }
   }
 
   handleHeal(collisions: Sprite[]) {
@@ -61,8 +61,7 @@ export class CyanGame extends BaseGame {
 
   destroy() {
     this.knifeManager.destroy();
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.startGameLoop, this);
   }
 
   preparingHelp() {}

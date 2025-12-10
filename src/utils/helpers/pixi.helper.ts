@@ -10,10 +10,16 @@ import {
   Ticker,
 } from "pixi.js";
 
-export const createTicker = (minFPS = 60, maxFPS = 60) => {
-  const ticker = new Ticker();
-  ticker.minFPS = minFPS;
-  ticker.maxFPS = maxFPS;
+// singleton
+let ticker: Ticker | null = null;
+
+export const getGlobalTicker = (minFPS = 60, maxFPS = 60): Ticker => {
+  if (!ticker) {
+    ticker = new Ticker();
+    ticker.minFPS = minFPS;
+    ticker.maxFPS = maxFPS;
+    ticker.start();
+  }
   return ticker;
 };
 
@@ -29,7 +35,7 @@ type PaddingXY = {
 export const areRectanglesColliding = (
   rect1: PixiElement,
   rect2: PixiElement,
-  padding?: Partial<PaddingXY>,
+  padding?: Partial<PaddingXY>
 ) => {
   const bounds1 = rect1.getBounds();
   const bounds2 = rect2.getBounds();
@@ -75,7 +81,7 @@ function isPointInPolygon(point: Point, polygon: Polygon) {
 
 export const arePolygonsColliding = (
   spriteA: Sprite | Graphics | ContainerChild,
-  spriteB: Sprite | Graphics | ContainerChild,
+  spriteB: Sprite | Graphics | ContainerChild
 ) => {
   const polygonA = spriteA.hitArea as Polygon;
   const polygonB = spriteB.hitArea as Polygon;

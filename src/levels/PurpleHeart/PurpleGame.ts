@@ -5,6 +5,7 @@ import { NoteManager } from "@/levels/PurpleHeart/helpers/NoteManager.ts";
 import { TextManager } from "@/levels/PurpleHeart/helpers/TextManager.ts";
 import { Health } from "@/ui/Health/Health.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
+import { getGlobalTicker } from "@/utils/helpers/pixi.helper";
 
 export class PurpleGame extends BaseGame {
   private noteManager: NoteManager;
@@ -16,7 +17,7 @@ export class PurpleGame extends BaseGame {
     app: PIXI.Application,
     heart: Heart,
     health: Health,
-    onFinish: () => void,
+    onFinish: () => void
   ) {
     super(app, heart, health, onFinish);
     heart.maxHeightFromBottom = 0;
@@ -30,25 +31,22 @@ export class PurpleGame extends BaseGame {
   async initialize() {
     await this.noteManager.initialize();
     await this.textManager.initialize();
-    this.startGameLoop();
 
-    this.ticker.start();
+    getGlobalTicker().add(this.startGameLoop, this);
     return this;
   }
 
   startGameLoop() {
-    this.ticker.add(() => {
-      this.handleDamage(this.noteManager.infiniteNotesAnimation()); // works even after saving
-      const collisions = this.textManager.infiniteTextAnimation();
+    this.handleDamage(this.noteManager.infiniteNotesAnimation()); // works even after saving
+    const collisions = this.textManager.infiniteTextAnimation();
 
-      this.isBtnAndHeartColliding =
-        this.textManager.actButton.isCollidingWithHeart(this.heart);
-      if (this.status === "HELPING") {
-        this.handleHeal(collisions);
-      } else {
-        this.handleDamage(collisions);
-      }
-    });
+    this.isBtnAndHeartColliding =
+      this.textManager.actButton.isCollidingWithHeart(this.heart);
+    if (this.status === "HELPING") {
+      this.handleHeal(collisions);
+    } else {
+      this.handleDamage(collisions);
+    }
   }
 
   handleHeal(collisions: Container[]) {
@@ -75,7 +73,6 @@ export class PurpleGame extends BaseGame {
   destroy(): Promise<void> | void {
     this.noteManager.destroy();
     this.textManager.destroy();
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.startGameLoop, this);
   }
 }
