@@ -14,6 +14,19 @@ import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Pan } from "@/levels/GreenHeart/assets/sprite/Pan.ts";
 import { EGG_POLYGON, Fire } from "@/levels/GreenHeart/assets/sprite/Fire.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
+import { GLOBAL_SCALE, HEIGHT, WIDTH } from "@/config/engine";
+import { BaseItem } from "@/core/BaseItem";
+
+type FireState = {
+  sprite: Sprite;
+  startX: number;
+  startY: number;
+  vx: number;
+  riseT: number; // 0 → 1
+  fallT: number; // 0 → 1
+  phase: "RISING" | "FALLING";
+  remove: boolean;
+};
 
 export class PanManager {
   public actButton = new ActButton();
@@ -23,19 +36,16 @@ export class PanManager {
   private status: "IDLE" | "HELPING" | "DESTROY" = "IDLE";
 
   private readonly pans: Pan[] = [];
-  private readonly spacing = 50;
-  private readonly panWidth = 190;
-  private readonly panHeight = 30;
-  private readonly riseDistance = 70;
-  private readonly fallDistance;
-  private readonly horizontalFireMovement = 170;
+  private readonly spacing = 50 * GLOBAL_SCALE;
+  private readonly riseDistance = 70 * GLOBAL_SCALE;
+  private readonly horizontalFireMovement = 170 * GLOBAL_SCALE;
+
+  private fires: FireState[] = [];
 
   constructor(
     private readonly app: Application,
     private readonly heart: Heart
-  ) {
-    this.fallDistance = this.app.renderer.height + this.riseDistance;
-  }
+  ) {}
 
   async initialize() {
     await this.actButton.initialize();
@@ -45,58 +55,73 @@ export class PanManager {
     const panTexture = assets.pan;
 
     const itemCount = 3;
-    const totalWidth = this.app.renderer.width;
-    const totalItemWidth = this.panWidth * itemCount;
-    const totalSpacing = (itemCount - 1) * this.spacing;
-    const startX = (totalWidth - (totalItemWidth + totalSpacing)) / 2;
+    const panWidth = Pan.width * GLOBAL_SCALE;
+
+    const totalWidth = panWidth * itemCount + this.spacing * itemCount;
+    const pivotOffset = Pan.width - 70;
+    const startX = (WIDTH - totalWidth) / 2 + pivotOffset * GLOBAL_SCALE * 1.5;
 
     for (let i = 0; i < itemCount; i++) {
-      const x = startX + i * (this.panWidth + this.spacing);
-      const y = 150;
-      const pan = new Pan({
-        texture: panTexture,
-        width: this.panWidth,
-        height: this.panHeight,
-        x: x + this.panWidth,
-        y,
-      });
+      const x = startX + i * (panWidth + this.spacing);
 
-      pan.container.pivot.set(this.panWidth - 70, 0);
+      const y = 150 * GLOBAL_SCALE;
+      const pan = new Pan({ texture: panTexture, x, y });
+      pan.container.scale.set(GLOBAL_SCALE * 1.5);
+      pan.container.pivot.set(Pan.width - 70, 0);
       this.animatePanRotation(pan);
       this.app.stage.addChild(pan.container);
       this.pans.push(pan);
     }
 
-    return this.generateFire();
+    this.generateFire();
   }
 
-  async animateFireRiseAndFall(fire: Fire) {
+  private spawnFire(x: number, y: number, item: BaseItem) {
     const moveRight = getRandomBoolean();
-    if (!moveRight) {
-      fire.container.scale.x *= -1; // Mirror the fire if moving left
-    }
-
-    const startY = fire.container.y;
-    const startX = fire.container.x;
-    const horizontalOffset = moveRight
+    const vx = moveRight
       ? this.horizontalFireMovement
       : -this.horizontalFireMovement;
-    await animateWithTimer(300, (progress, destroy) => {
-      if (this.status === "DESTROY") return destroy();
-      fire.container.y = startY - this.riseDistance * progress;
-    });
 
-    await animateWithTimer(3000, (progress, destroy) => {
-      if (this.status === "DESTROY") return destroy();
-      fire.container.x = startX + horizontalOffset * progress;
-      const gravityEffect = Math.pow(progress, 2); // Simulate gravity
-      fire.container.y =
-        startY - this.riseDistance + this.fallDistance * gravityEffect;
-      if (fire.container.label !== "act-button") {
-        fire.container.alpha = 1 - progress;
-      }
+    this.fires.push({
+      sprite: item.container,
+      startX: x,
+      startY: y,
+      vx,
+      riseT: 0,
+      fallT: 0,
+      phase: "RISING",
+      remove: false,
     });
-    this.app.stage.removeChild(fire.container);
+  }
+
+  public updateFires(dt: number) {
+    for (let i = this.fires.length - 1; i >= 0; i--) {
+      const f = this.fires[i];
+
+      if (f.phase === "RISING") {
+        f.riseT += dt * 0.004;
+        if (f.riseT >= 1) {
+          f.riseT = 1;
+          f.phase = "FALLING";
+        }
+        f.sprite.y = f.startY - this.riseDistance * f.riseT;
+      }
+
+      if (f.phase === "FALLING") {
+        f.fallT += dt * 0.0003;
+        const gravity = f.fallT * f.fallT * HEIGHT;
+        f.sprite.x = f.startX + f.vx * f.fallT;
+        f.sprite.y = f.startY - this.riseDistance + gravity;
+        f.sprite.alpha = 1 - f.fallT;
+
+        if (f.fallT >= 1) f.remove = true;
+      }
+
+      if (f.remove) {
+        this.app.stage.removeChild(f.sprite);
+        this.fires.splice(i, 1);
+      }
+    }
   }
 
   public checkCollisions() {
@@ -113,33 +138,33 @@ export class PanManager {
 
   private generateFire() {
     let count = 0;
-
     this.pans.forEach((pan) => {
-      if (this.status === "DESTROY") return;
-
-      const y = pan.container.y;
-
-      const randomInterval = getRandomInRange(300, 700);
-
-      setInterval(() => {
-        if (this.status === "DESTROY") return;
-        const baseX = pan.container.x - (pan.container.width / 2 + 20);
-        const randomOffset = getRandomBoolean() ? -20 : 0;
-        const x = baseX + randomOffset;
+      const interval = getRandomInRange(300, 700);
+      const timerId = setInterval(() => {
+        if (this.status === "DESTROY") return clearTimeout(timerId);
         count++;
 
-        if (count % 80 === 0 && count !== 0 && this.status !== "HELPING") {
-          this.createActButton(x, y);
-          this.app.stage.addChild(this.actButton.container);
+        const x =
+          pan.container.x -
+          (Pan.width * GLOBAL_SCALE * 1.5) / 2 +
+          getRandomInRange(-20, 20);
+        const y = pan.container.y;
 
-          return this.animateFireRiseAndFall(this.actButton);
-        }
         const fire = new Fire({ texture: this.fireTexture!, x, y });
+        fire.container.scale.set(GLOBAL_SCALE * 2);
         if (this.status === "HELPING") this.replaceFireWithEgg(fire.container);
 
         this.app.stage.addChild(fire.container);
-        this.animateFireRiseAndFall(fire);
-      }, randomInterval);
+        this.spawnFire(x, y, fire);
+
+        if (count % 80 === 0 && count !== 0 && this.status !== "HELPING") {
+          this.createActButton(x, y);
+          this.spawnFire(x, y, this.actButton);
+
+          this.app.stage.addChild(this.actButton.container);
+          count = 0;
+        }
+      }, interval);
     });
   }
 
@@ -157,6 +182,7 @@ export class PanManager {
     this.actButton.container.visible = true;
     this.actButton.container.rotation = Math.PI / 2;
     this.actButton.container.position.set(x, y);
+    this.actButton.container.scale.set(GLOBAL_SCALE);
   }
 
   animatePanRotation(pan: Pan) {
@@ -188,10 +214,8 @@ export class PanManager {
 
   public async helpUser() {
     this.status = "HELPING";
-    this.app.stage.children.forEach((sprite) => {
-      if (sprite.label === "fire") {
-        this.replaceFireWithEgg(sprite as Sprite);
-      }
+    this.fires.forEach(({ sprite }) => {
+      this.replaceFireWithEgg(sprite);
     });
   }
 
@@ -200,9 +224,10 @@ export class PanManager {
     this.pans.forEach((pan) => {
       pan.container.destroy();
       this.app.stage.removeChild(pan.container);
-      this.app.stage.children.forEach((sprite) => {
-        if (sprite.label === "fire" || sprite.label === "egg") sprite.destroy();
-      });
+    });
+    this.fires.forEach(({ sprite }) => {
+      sprite.destroy();
+      this.app.stage.removeChild(sprite);
     });
     this.actButton.container.destroy();
   }

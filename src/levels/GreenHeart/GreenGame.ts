@@ -5,6 +5,7 @@ import { Health } from "@/ui/Health/Health.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { Heart } from "@/utils/items/Heart.ts";
 import { getGlobalTicker } from "@/utils/helpers/pixi.helper";
+import { GLOBAL_SCALE } from "@/config/engine";
 
 export class GreenGame extends BaseGame {
   private panManager: PanManager;
@@ -15,7 +16,7 @@ export class GreenGame extends BaseGame {
     health: Health,
     onFinish: () => void
   ) {
-    heart.maxHeightFromBottom = 300;
+    heart.maxHeightFromBottom = 300 * GLOBAL_SCALE;
     super(app, heart, health, onFinish, -4);
     this.panManager = new PanManager(app, heart);
   }
@@ -27,7 +28,8 @@ export class GreenGame extends BaseGame {
     return this;
   }
 
-  startGameLoop() {
+  startGameLoop(ticker: PIXI.Ticker) {
+    this.panManager.updateFires(ticker.deltaMS);
     const collisions = this.checkCollisions();
     if (this.status === "HELPING") {
       this.handleHeal(collisions);

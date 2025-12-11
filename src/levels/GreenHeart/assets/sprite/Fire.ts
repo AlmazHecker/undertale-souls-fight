@@ -3,9 +3,12 @@ import { ItemOptions } from "@/utils/types.ts";
 import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Fire extends BaseItem {
+  public static readonly width = 24;
+  public static readonly height = 45;
+
   constructor(options: ItemOptions) {
     const sprite = new PIXI.Sprite(options.texture);
-    super(sprite, options.x, options.y, 50, 93);
+    super(sprite, options.x, options.y, Fire.width, Fire.height);
     this.container._zIndex = 2;
     this.centerWithPivot();
     this.container.label = "fire";

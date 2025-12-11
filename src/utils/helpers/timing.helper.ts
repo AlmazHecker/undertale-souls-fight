@@ -25,10 +25,7 @@ export const animateWithTimer = (
       const elapsedProgress = easingFunction(progress);
       onUpdate(elapsedProgress, destroyLoop);
 
-      if (progress >= 1) {
-        ticker.remove(animate);
-        resolve();
-      }
+      if (progress >= 1) destroyLoop();
     };
 
     ticker.add(animate);

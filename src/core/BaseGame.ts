@@ -1,4 +1,4 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container, Ticker } from "pixi.js";
 import EventEmitter from "eventemitter3";
 import { Heart } from "../utils/items/Heart.ts";
 import { Health } from "@/ui/Health/Health.ts";
@@ -35,7 +35,7 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
 
   abstract initialize(): Promise<unknown>;
 
-  abstract startGameLoop(): void;
+  abstract startGameLoop(ticker: Ticker): void;
 
   abstract handleHeal(collisions: Container[]): void;
 
