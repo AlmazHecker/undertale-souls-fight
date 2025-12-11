@@ -2,14 +2,16 @@ import * as PIXI from "pixi.js";
 import { BaseItem } from "@/core/BaseItem.ts";
 
 export class Star extends BaseItem {
+  public static width = 40;
+  public static height = 44;
+
   constructor(x = 0, y = 0, texture: PIXI.Texture) {
     const sprite = new PIXI.Sprite(texture);
-    super(sprite, x, y);
+    super(sprite, x, y, Star.width, Star.height);
 
     this.container._zIndex = 2;
     this.container.label = "star";
 
-    this.centerWithPivot();
     this.container.hitArea = this.toPolygon(svgPoints);
   }
 }

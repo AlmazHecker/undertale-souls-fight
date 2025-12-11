@@ -40,15 +40,12 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-
-  display: grid;
-  place-items: center;
-  place-content: center;
-
-  /* min-width: 100vw;
-  min-height: 100vh; */
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 #controls-container {

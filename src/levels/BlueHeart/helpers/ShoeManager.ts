@@ -5,22 +5,18 @@ import { Application, Assets, Sprite } from "pixi.js";
 
 import { Shoe } from "../assets/sprite/Shoe.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
-import {
-  arePolygonsColliding,
-  getGlobalTicker,
-} from "@/utils/helpers/pixi.helper.ts";
+import { arePolygonsColliding } from "@/utils/helpers/pixi.helper.ts";
 import { animateWithTimer, lerp } from "@/utils/helpers/timing.helper.ts";
+import { GLOBAL_SCALE as GS, HEIGHT, WIDTH } from "@/config/engine.ts";
+
+const GLOBAL_SCALE = GS * 1.3;
 
 export class ShoeManager {
   public readonly actButton = new ActButton();
-  private shoeSpeed = 2.3;
+  private shoeSpeed = 1.7 * GLOBAL_SCALE;
   private verticalMoveDisabled: boolean = false;
-  private readonly bottomOffset = 50;
-  private readonly shoeSpacing = 20;
-  private readonly shoeWidth = 70;
-  private readonly shoeHeight = 150;
-  private readonly actButtonOffset = 20;
-  private readonly spriteYMap = new Map<PIXI.Sprite, number>();
+  private readonly verticalAmplitude = 30 * GLOBAL_SCALE;
+  private readonly shoeSpacing = 35 * GLOBAL_SCALE;
 
   private readonly shoes: Sprite[] = [];
   private readonly defaultY: number;
@@ -30,31 +26,27 @@ export class ShoeManager {
     private readonly heart: Heart,
     private readonly actButtonCountDown: number
   ) {
-    this.defaultY =
-      this.app.renderer.height - this.shoeHeight - this.bottomOffset;
+    this.defaultY = HEIGHT - Shoe.height * GLOBAL_SCALE;
   }
 
   async initialize() {
     await this.actButton.initialize();
     const bundleAssets = await Assets.loadBundle("blue");
 
-    const numShoesX =
-      Math.floor(
-        this.app.renderer.width / (this.shoeWidth + this.shoeSpacing)
-      ) + 1;
+    const numShoesX = Math.floor(WIDTH / (Shoe.width + this.shoeSpacing)) + 1;
 
     for (let i = 0; i < numShoesX; i++) {
-      const x =
-        this.app.renderer.width + i * (this.shoeWidth + this.shoeSpacing);
+      const x = WIDTH + i * (Shoe.width + this.shoeSpacing);
       const y = this.defaultY;
       const shoe = new Shoe(x, y, bundleAssets.shoe);
+
+      shoe.centerWithPivot();
+      shoe.container.scale.set(GLOBAL_SCALE);
+
+      (shoe as any).container.offset = i * 100 + Math.random() * 500;
+
       this.app.stage.addChild(shoe.container);
       this.shoes.push(shoe.container);
-
-      const movementCountDown = 500 * i + Math.random() * 500;
-      setTimeout(() => {
-        this.startVerticalMovement(shoe.container, this.bottomOffset);
-      }, movementCountDown);
     }
 
     await this.createActButton();
@@ -64,43 +56,56 @@ export class ShoeManager {
     const randomIndex = Math.floor(Math.random() * this.shoes.length);
     const shoe = this.shoes[randomIndex];
 
-    actButton.container.x = shoe.x + this.shoeWidth / 2;
-    actButton.container.y =
-      this.defaultY + this.shoeHeight / 2 + this.actButtonOffset;
+    actButton.container.x = shoe.x + Shoe.width / 2;
+    actButton.container.y = this.defaultY + Shoe.height / 2;
 
     actButton.container.visible = true;
-    this.startVerticalMovement(actButton.container, this.bottomOffset);
+    (actButton as any).container.offset = (shoe as any).offset;
     this.app.stage.removeChild(shoe);
     this.shoes[randomIndex] = actButton.container;
   }
 
   public infiniteShoesLogic() {
     const collisions: Sprite[] = [];
-    const { shoes, shoeSpeed, shoeWidth, shoeSpacing, actButton, heart } = this;
+    const { shoes, shoeSpeed, shoeSpacing, actButton, heart } = this;
     const lastShoeX = shoes[shoes.length - 1].x;
 
-    for (let i = 0; i < shoes.length; i++) {
-      const shoe = shoes[i];
+    shoes.forEach((shoe, i) => {
       shoe.x -= shoeSpeed;
-      if (shoe.x + shoeWidth < 0) {
-        shoe.x = lastShoeX + shoeWidth + shoeSpacing;
+      if (shoe.x + Shoe.width < 0) {
+        shoe.x = lastShoeX + Shoe.width + shoeSpacing;
 
         if (shoe.label === "act-button") {
-          actButton.container.x = shoe.x + shoeWidth / 2;
+          actButton.container.x = shoe.x + Shoe.width / 2;
         }
 
         shoes.push(shoes.splice(i, 1)[0]);
         i--;
-        continue;
+        return;
       }
 
       if (shoe.label !== "act-button") {
         const isDamaged = arePolygonsColliding(shoe, heart.container);
         if (isDamaged) collisions.push(shoe);
       }
-    }
+
+      this.startVerticalMovement(shoe, i);
+    });
 
     return collisions;
+  }
+
+  private startVerticalMovement(shoe: PIXI.Sprite, i: number) {
+    const shoeHeightScaled = Shoe.height * GLOBAL_SCALE;
+    const baselineY = HEIGHT - shoeHeightScaled / 2 - this.verticalAmplitude;
+
+    const speed = 0.0042;
+
+    if (this.verticalMoveDisabled) return;
+
+    const t = performance.now() * speed + (shoe as any).offset;
+    const easedSin = Math.sin(t);
+    shoe.y = baselineY + easedSin * this.verticalAmplitude;
   }
 
   private async createActButton() {
@@ -110,33 +115,6 @@ export class ShoeManager {
     setTimeout(() => {
       this.replaceRandomShoeWithActButton(this.actButton);
     }, this.actButtonCountDown);
-  }
-
-  private startVerticalMovement(sprite: PIXI.Sprite, bottomOffset: number) {
-    if (!this.spriteYMap.has(sprite)) {
-      this.spriteYMap.set(sprite, sprite.y);
-    }
-    const originalY = this.spriteYMap.get(sprite)!;
-    const downY = originalY + bottomOffset;
-    const moveSpeed = 1.5;
-    let movingDown = true;
-
-    const moveTicker = getGlobalTicker();
-    moveTicker.add(() => {
-      if (this.verticalMoveDisabled) moveTicker.destroy();
-
-      sprite.y += movingDown ? moveSpeed : -moveSpeed;
-
-      if (movingDown && sprite.y >= downY) {
-        movingDown = false;
-      } else if (!movingDown && sprite.y <= originalY) {
-        moveTicker.destroy();
-        this.startVerticalMovement(sprite, bottomOffset);
-      }
-    });
-    moveTicker.start();
-
-    return moveTicker;
   }
 
   public async preparingHelp() {

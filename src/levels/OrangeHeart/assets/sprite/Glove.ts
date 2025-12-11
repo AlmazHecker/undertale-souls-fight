@@ -10,7 +10,6 @@ export class Glove extends BaseItem {
     const sprite = new PIXI.Sprite(options.texture);
     super(sprite, options.x, options.y, Glove.width, Glove.height);
     this.container._zIndex = 2;
-    console.log(options.texture);
 
     this.container.hitArea = this.toPolygon(GLOVE_POLYGON);
   }

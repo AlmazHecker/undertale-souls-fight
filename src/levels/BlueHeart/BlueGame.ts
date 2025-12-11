@@ -7,6 +7,8 @@ import { Heart } from "@/utils/items/Heart.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { Health } from "@/ui/Health/Health.ts";
 import { getGlobalTicker } from "@/utils/helpers/pixi.helper.ts";
+import { GLOBAL_SCALE } from "@/config/engine.ts";
+import { Star } from "./assets/sprite/Star.ts";
 
 export class BlueGame extends BaseGame {
   private shoeManager: ShoeManager;
@@ -21,7 +23,7 @@ export class BlueGame extends BaseGame {
     super(app, heart, health, onFinish);
     this.shoeManager = new ShoeManager(app, heart, 10000);
     this.starManager = new StarManager(app, heart);
-    this.heart.maxHeightFromBottom = 60;
+    this.heart.maxHeightFromBottom = Star.height * (1.2 * GLOBAL_SCALE);
   }
 
   async preparingHelp() {
@@ -39,7 +41,7 @@ export class BlueGame extends BaseGame {
 
   startGameLoop() {
     const collisions = this.checkCollisions();
-    if (this.status === "HELPING") {
+    if (this.status === "HELPING" || this.starManager.isHelping) {
       this.handleHeal(collisions);
     } else {
       this.handleDamage(collisions);
@@ -55,8 +57,8 @@ export class BlueGame extends BaseGame {
 
   async helpUser() {
     await Promise.all([
-      this.shoeManager.helpUser(),
       this.starManager.helpUser(),
+      this.shoeManager.helpUser(),
     ]);
 
     setTimeout(() => {

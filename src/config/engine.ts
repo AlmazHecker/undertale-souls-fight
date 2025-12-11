@@ -15,14 +15,7 @@ export const initializePixi = async () => {
 
   let heart: Heart | undefined = undefined;
 
-  await app.init({
-    resizeTo: window,
-    width: WIDTH,
-    height: HEIGHT,
-  });
-
-  app.canvas.style.width = "100%";
-  app.canvas.style.height = "100%";
+  await app.init({ resizeTo: window, width: WIDTH, height: HEIGHT });
 
   if (import.meta.env.MODE === "development") {
     const winda = window as unknown as Record<string, unknown>;

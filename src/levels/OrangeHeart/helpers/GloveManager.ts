@@ -2,16 +2,7 @@ import * as PIXI from "pixi.js";
 import { Application, Assets, Polygon, Sprite, Texture } from "pixi.js";
 
 import { Heart } from "@/utils/items/Heart.ts";
-import {
-  animateWithTimer,
-  callInfinitely,
-  easeInOut,
-  lerp,
-} from "@/utils/helpers/timing.helper.ts";
-import {
-  getRandomBoolean,
-  getRandomIndex,
-} from "@/utils/helpers/random.helper.ts";
+import { getRandomIndex } from "@/utils/helpers/random.helper.ts";
 import { Glove, LIKE_POLYGON } from "../assets/sprite/Glove.ts";
 import {
   arePolygonsColliding,
@@ -28,16 +19,20 @@ export class GloveManager {
     { length: 9 },
     () => new PIXI.Container()
   );
-  private minRadius = 100 * GLOBAL_SCALE;
+  private minRadius = 120 * GLOBAL_SCALE;
   private maxRadius = 200 * GLOBAL_SCALE;
   private rotationSpeed = 0.007;
-  private stop: boolean = false;
   private likeTexture!: Texture;
+
   private rowSpacing!: number;
   private columnHeight!: number;
-
   private numColumns = 3;
   private numRows = 3;
+
+  private radiusTime = 0;
+  private radiusSpeed = (Math.PI * 2) / 2000; // 2000ms full cycle
+  private angleStep = (2 * Math.PI) / 7;
+  private numGlovesPerContainer = 7;
 
   constructor(
     private readonly app: Application,
@@ -50,36 +45,28 @@ export class GloveManager {
     const assets = await Assets.loadBundle("orange");
     this.likeTexture = assets.like;
 
-    const numSprites = 7;
-    const angleStep = (2 * Math.PI) / numSprites;
-
-    const containerWidth = 0;
     const containerHeight = -350 * GLOBAL_SCALE;
-
-    const totalGridWidth = this.numColumns + containerWidth;
     const totalGridHeight = this.numRows + containerHeight;
 
-    const offsetX = (WIDTH - totalGridWidth) / 2;
+    const horizontalSpacing = 450 * GLOBAL_SCALE; // fixed spacing, scales with canvas
+    const totalGridWidth = (this.numColumns - 1) * horizontalSpacing;
+    const startX = (WIDTH - totalGridWidth) / 2;
     const offsetY = (HEIGHT - totalGridHeight) / 2;
 
     for (let i = 0; i < this.gloveContainers.length; i++) {
       const container = this.gloveContainers[i];
 
       const row = Math.floor(i / this.numColumns);
-      const column = i % this.numColumns;
+      const col = i % this.numColumns;
 
-      const y = row * offsetY + 100;
-      const x = column * offsetX;
-
-      container.x = x;
-      container.y = y;
-      container.label = `${column}`;
+      container.y = row * offsetY + 150;
+      container.x = startX + col * horizontalSpacing;
 
       this.rowSpacing = offsetY;
       this.columnHeight = this.rowSpacing * this.numRows;
 
-      for (let j = 0; j < numSprites; j++) {
-        const angle = j * angleStep;
+      for (let j = 0; j < this.numGlovesPerContainer; j++) {
+        const angle = j * this.angleStep;
 
         const glove = new Glove({ texture: assets.glove });
         const sprite = glove.container;
@@ -89,52 +76,26 @@ export class GloveManager {
 
         sprite.rotation = angle + Math.PI / 2;
 
-        sprite.label = `${i}`;
-
         container.addChild(sprite);
       }
 
-      this.animateRadius(container);
       this.app.stage.addChild(container);
     }
-    getGlobalTicker().add(this.animateContainersRotation, this);
+    getGlobalTicker().add(this.startAnimation, this);
     return this.createActButton();
   }
 
-  animateRadius(container: PIXI.Container<Sprite>) {
-    const duration = 1500;
+  startAnimation(ticker: PIXI.Ticker) {
+    // radius update
+    this.radiusTime += ticker.deltaMS;
+    const t = (this.radiusTime * this.radiusSpeed) % (Math.PI * 2);
+    const osc = (1 - Math.cos(t)) * 0.5; // Very cool trick. Oscillates between 0 and 1
+    const radius = this.minRadius + osc * (this.maxRadius - this.minRadius);
 
-    const animateRadiusChange = async (
-      startRadius: number,
-      endRadius: number
-    ) => {
-      await animateWithTimer(
-        duration,
-        (progress, destroy) => {
-          if (this.stop) return destroy();
-          const angleStep = (2 * Math.PI) / 7;
+    // update all containers
+    for (let c = 0; c < this.gloveContainers.length; c++) {
+      const container = this.gloveContainers[c];
 
-          const currentRadius = lerp(startRadius, endRadius, progress);
-          container.children.forEach((glove, j) => {
-            const angle = j * angleStep;
-
-            glove.x = currentRadius * Math.cos(angle);
-            glove.y = currentRadius * Math.sin(angle);
-          });
-        },
-        easeInOut
-      );
-    };
-
-    callInfinitely(async () => {
-      await animateRadiusChange(this.minRadius, this.maxRadius);
-      await animateRadiusChange(this.maxRadius, this.minRadius);
-    }, !this.stop);
-  }
-  animateContainersRotation() {
-    const screenH = this.app.renderer.height;
-
-    this.gloveContainers.forEach((container) => {
       container.rotation += this.rotationSpeed;
       if (container.rotation >= 2 * Math.PI) {
         container.rotation -= 2 * Math.PI;
@@ -143,11 +104,20 @@ export class GloveManager {
       container.y += 1;
 
       const visualTop = container.y - this.maxRadius;
-
-      if (visualTop > screenH) {
+      if (visualTop > HEIGHT) {
         container.y -= this.columnHeight;
       }
-    });
+
+      // update children radius positions
+      const children = container.children;
+      for (let j = 0; j < children.length; j++) {
+        const glove = children[j];
+        const angle = j * this.angleStep;
+
+        glove.x = radius * Math.cos(angle);
+        glove.y = radius * Math.sin(angle);
+      }
+    }
   }
 
   public checkCollisions() {
@@ -180,7 +150,8 @@ export class GloveManager {
   }
 
   private createActButton() {
-    const randomContainerIndex = getRandomBoolean() ? 1 : 4;
+    const indexes = [1, 4, 7];
+    const randomContainerIndex = indexes[getRandomIndex(indexes)];
     this.gloveContainers[randomContainerIndex].addChild(
       this.actButton.container
     );
@@ -204,11 +175,10 @@ export class GloveManager {
   }
 
   destroy() {
-    getGlobalTicker().remove(this.animateContainersRotation, this);
+    getGlobalTicker().remove(this.startAnimation, this);
 
     this.app.stage.removeChild(...this.gloveContainers);
     this.gloveContainers.forEach((c) => c.destroy());
-    this.stop = true;
     this.actButton.container.destroy();
   }
 }
