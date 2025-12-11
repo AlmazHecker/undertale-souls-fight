@@ -24,7 +24,7 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 3;
+  private currentLevel = 4;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,

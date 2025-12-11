@@ -6,6 +6,7 @@ import { TextManager } from "@/levels/PurpleHeart/helpers/TextManager.ts";
 import { Health } from "@/ui/Health/Health.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
 import { getGlobalTicker } from "@/utils/helpers/pixi.helper";
+import { WIDTH } from "@/config/engine";
 
 export class PurpleGame extends BaseGame {
   private noteManager: NoteManager;
@@ -22,8 +23,18 @@ export class PurpleGame extends BaseGame {
     super(app, heart, health, onFinish);
     heart.maxHeightFromBottom = 0;
 
-    this.textManager = new TextManager(app, heart, 10000);
-    this.noteManager = new NoteManager(app, heart);
+    // making smaller area
+    const activeWidth = Math.max(600, WIDTH * 0.65);
+    const sideMargin = (WIDTH - activeWidth) / 2;
+
+    this.textManager = new TextManager(
+      app,
+      heart,
+      sideMargin,
+      activeWidth,
+      10000
+    );
+    this.noteManager = new NoteManager(app, heart, sideMargin, activeWidth);
 
     this.app.stage.addChild(this.heart.container);
   }

@@ -32,7 +32,7 @@ export class PanManager {
 
   constructor(
     private readonly app: Application,
-    private readonly heart: Heart,
+    private readonly heart: Heart
   ) {
     this.fallDistance = this.app.renderer.height + this.riseDistance;
   }

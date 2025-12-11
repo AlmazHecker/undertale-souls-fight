@@ -2,32 +2,38 @@ import { Application, Assets, Container } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
 import { areRectanglesColliding } from "@/utils/helpers/pixi.helper.ts";
 import { Note } from "@/levels/PurpleHeart/assets/sprite/Note.ts";
+import { GLOBAL_SCALE, HEIGHT } from "@/config/engine";
 
 export class NoteManager {
-  private moveSpeed = 3;
-  private noteHeight = 238;
+  private moveSpeed = 3 * GLOBAL_SCALE;
+  private noteHeight = Note.height * GLOBAL_SCALE;
   public leftNotes: Container[] = [];
   public rightNotes: Container[] = [];
 
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
+    private readonly sideMargin: number,
+    private readonly activeWidth: number
   ) {}
 
   async initialize() {
     const assets = await Assets.loadBundle("purple");
 
-    const numNotesY = Math.ceil(this.app.renderer.height / this.noteHeight) + 1;
-    const canvasWidth = this.app.renderer.width;
+    const numNotesY = Math.ceil(HEIGHT / this.noteHeight) + 1;
 
     for (let y = 0; y <= numNotesY; y++) {
-      const note = new Note(assets.note, 0, y * this.noteHeight);
+      const note = new Note(assets.note, this.sideMargin, y * this.noteHeight);
       this.leftNotes.push(note.container);
       this.app.stage.addChild(note.container);
     }
 
     for (let y = 0; y <= numNotesY; y++) {
-      const note = new Note(assets.note, canvasWidth, y * this.noteHeight);
+      const note = new Note(
+        assets.note,
+        this.sideMargin + this.activeWidth,
+        y * this.noteHeight
+      );
       note.container.rotation = Math.PI;
       this.rightNotes.push(note.container);
       this.app.stage.addChild(note.container);

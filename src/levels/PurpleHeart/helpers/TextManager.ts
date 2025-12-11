@@ -1,10 +1,7 @@
 import * as PIXI from "pixi.js";
-import { Application, Container, Sprite } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { Heart } from "@/utils/items/Heart.tsx";
-import {
-  areRectanglesColliding,
-  getGlobalTicker,
-} from "@/utils/helpers/pixi.helper.ts";
+import { areRectanglesColliding } from "@/utils/helpers/pixi.helper.ts";
 
 import {
   getRandomBoolean,
@@ -17,28 +14,36 @@ import {
 } from "@/levels/PurpleHeart/helpers/constants.ts";
 import { Text } from "@/levels/PurpleHeart/assets/sprite/Text.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
+import { GLOBAL_SCALE, HEIGHT } from "@/config/engine";
 
 export class TextManager {
   public actButton = new ActButton();
-  private readonly textHeight = 50;
-  private readonly textSpacing = 0;
-  private readonly moveSpeed = 2;
+  private readonly textHeight = 40 * GLOBAL_SCALE;
+  private readonly textSpacing = 0 * GLOBAL_SCALE;
+  private readonly moveSpeed = 2 * GLOBAL_SCALE;
   private readonly yAxis: number[] = [];
   private texts: PIXI.Text[] = [];
+  private textStates: boolean[] = [];
   private activeWords: string[] = BAD_WORDS;
-  private stop: boolean = false;
+
+  private readonly startX;
+  private readonly endX;
 
   constructor(
     private readonly app: Application,
     private readonly heart: Heart,
+    private readonly sideMargin: number,
+    private readonly activeWidth: number,
     private readonly actButtonCountDown: number
-  ) {}
+  ) {
+    this.startX = this.sideMargin;
+    this.endX = this.sideMargin + this.activeWidth;
+  }
 
   async initialize() {
     await this.actButton.initialize();
-    const numTextsY = Math.ceil(
-      this.app.renderer.height / (this.textHeight + 10)
-    );
+
+    const numTextsY = Math.ceil(HEIGHT / this.textHeight);
 
     for (let y = 0; y <= numTextsY; y++) {
       const text = new Text(
@@ -49,11 +54,19 @@ export class TextManager {
 
       this.yAxis.push(text.text.y);
 
-      text.text.style.fontSize = 45;
+      text.text.style.fontSize = 45 * GLOBAL_SCALE;
       text.text.height = this.textHeight;
-      setTimeout(() => {
-        this.startHorizontalMovement(text.text);
-      }, Math.random() * 200);
+
+      const direction = getRandomBoolean();
+      this.textStates.push(direction);
+
+      // initiallly X will be close to startX or endX so user will have some time to move
+      const offsetRatio = Math.random() * 0.2;
+      const distance = this.activeWidth;
+      text.text.x = direction
+        ? this.startX + distance * offsetRatio
+        : this.endX - text.text.width - distance * offsetRatio;
+
       this.texts.push(text.text);
 
       this.app.stage.addChild(text.text);
@@ -63,9 +76,11 @@ export class TextManager {
   }
 
   public infiniteTextAnimation() {
+    this.startHorizontalMovement();
     const collisions: Container[] = [];
 
     this.texts.forEach((text) => {
+      if (!(text instanceof PIXI.Text)) return;
       const isDamaged = areRectanglesColliding(text, this.heart.container, {
         top: 10,
         bottom: 10,
@@ -91,42 +106,31 @@ export class TextManager {
     const text = this.texts[randomIndex];
     actButton.container.position.set(text.x, text.y);
     actButton.container.visible = true;
-    this.startHorizontalMovement(actButton.container);
+    actButton.container.scale.set(GLOBAL_SCALE);
+
     this.app.stage.removeChild(text);
-    this.texts.splice(randomIndex, 1);
+    // @ts-ignore
+    this.texts[randomIndex] = actButton.container;
   }
 
-  startHorizontalMovement(text: PIXI.Text | Sprite) {
-    const startX = 200;
-    const endX = this.app.screen.width - 200;
-    let movingRight = getRandomBoolean();
+  startHorizontalMovement() {
+    this.texts.forEach((text, index) => {
+      let movingRight = this.textStates[index];
 
-    const moveTicker = getGlobalTicker();
-
-    moveTicker.add(() => {
-      if (this.stop) return moveTicker.stop();
       text.x += movingRight ? this.moveSpeed : -this.moveSpeed;
+
       if (
-        (movingRight && text.x > endX) ||
-        (!movingRight && text.x < startX - text.width)
+        (movingRight && text.x + text.width >= this.endX) ||
+        (!movingRight && text.x <= this.startX)
       ) {
-        moveTicker.stop();
+        text.text = this.activeWords[getRandomIndex(this.activeWords)];
 
-        setTimeout(() => {
-          if (this.stop) return moveTicker.stop();
+        const shouldFlip = getRandomBoolean();
+        this.textStates[index] = shouldFlip ? !movingRight : movingRight;
 
-          if (text instanceof PIXI.Text) {
-            text.text = this.activeWords[getRandomIndex(this.activeWords)];
-          }
-
-          movingRight = getRandomBoolean();
-          text.x = movingRight ? startX - text.width : endX;
-          moveTicker.start();
-        }, Math.random() * 2000);
+        text.x = this.textStates[index] ? this.startX : this.endX - text.width;
       }
     });
-
-    moveTicker.start();
   }
 
   public async preparingHelp() {
@@ -148,14 +152,15 @@ export class TextManager {
   }
 
   public removeText(text: Container) {
-    if (text instanceof PIXI.Text) {
-      this.texts = this.texts.filter((t) => t !== text);
-      this.app.stage.removeChild(text);
-    }
-  }
+    if (!(text instanceof PIXI.Text)) return;
+    const index = this.texts.findIndex((t) => t === text);
 
+    if (index === -1) return;
+    this.texts.splice(index, 1);
+    this.textStates.splice(index, 1);
+    this.app.stage.removeChild(text);
+  }
   destroy() {
-    this.stop = true;
     this.actButton.container.destroy();
     this.app.stage.removeChild(...this.texts);
     this.texts.forEach((text) => text.destroy());
