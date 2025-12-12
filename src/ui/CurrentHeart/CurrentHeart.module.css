@@ -4,12 +4,15 @@
   top: 10%;
   transform: translate(-50%, -50%);
   z-index: 10;
-  width: 150px;
-  height: 160px;
   margin: 0 auto;
+
+  width: clamp(110px, 10vw, 48rem);
+  height: clamp(120px, 12vw, 48rem);
 }
 
 .current-soul {
+  width: clamp(40px, 2vw, 10rem);
+  height: clamp(40px, 2vw, 10rem);
   position: absolute;
   top: 55%;
   left: 50%;

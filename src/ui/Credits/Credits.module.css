@@ -1,5 +1,10 @@
 .container {
-  width: 800px;
+  width: 80%;
+  height: 100%;
+  margin: 0 auto;
+
+  display: grid;
+  place-items: center;
 }
 
 .content {
@@ -7,11 +12,9 @@
   text-align: start;
 
   font-size: 24px;
-  margin: 0;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  font-size: clamp(16px, 2vw, 96rem);
 }
 
 .intro {
-  font-size: 56px;
+  font-size: clamp(24px, 6vw, 96rem);
 }

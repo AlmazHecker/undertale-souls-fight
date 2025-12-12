@@ -193,7 +193,8 @@ export class PanManager {
 
     let wiggleDirection = 20;
     const animate = async () => {
-      await animateWithTimer(wiggleDuration, (progress) => {
+      await animateWithTimer(wiggleDuration, (progress, destroy) => {
+        if (this.status === "DESTROY") return destroy();
         pan.container.x = startX + wiggleDirection * progress;
         const lift = Math.sin(progress * Math.PI) * 5; // Slight lift to mimic real movement
         pan.container.y = startY - lift;
@@ -201,10 +202,12 @@ export class PanManager {
 
       pan.container.x = startX + wiggleDirection;
 
-      await animateWithTimer(rotationDuration, (progress) => {
+      await animateWithTimer(rotationDuration, (progress, destroy) => {
+        if (this.status === "DESTROY") return destroy();
         pan.container.rotation = progress * (Math.PI / 9);
       });
-      await animateWithTimer(rotationDuration, (progress) => {
+      await animateWithTimer(rotationDuration, (progress, destroy) => {
+        if (this.status === "DESTROY") return destroy();
         pan.container.rotation = (1 - progress) * (Math.PI / 9);
       });
       wiggleDirection = wiggleDirection === -20 ? 20 : -20;

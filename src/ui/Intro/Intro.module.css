@@ -1,0 +1,16 @@
+.container {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 1vw, 3rem);
+}
+
+.controls {
+  font-size: clamp(1.2rem, 1.4vw, 32rem);
+}

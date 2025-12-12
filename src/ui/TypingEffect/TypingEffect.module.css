@@ -1,5 +1,5 @@
 .typing-effect {
-  font-size: clamp(1.5rem, 2vw, 3rem);
+  font-size: clamp(1.5rem, 2vw, 32rem);
 
   position: relative;
   white-space: pre;

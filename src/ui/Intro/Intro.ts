@@ -1,4 +1,5 @@
 import SoulHearts from "./SoulHearts.ts";
+import css from "./Intro.module.css";
 import Button from "../Button/Button.ts";
 import { SHARED_SOUNDS } from "@/config/preload.ts";
 
@@ -58,11 +59,15 @@ type IntroProps = {
   nextView: () => void;
 };
 const Intro = ({ nextView }: IntroProps) => {
-  const controlsContainer = document.getElementById("controls-container")!;
+  const controls = document.createElement("div");
+  controls.className = css.controls;
+  controls.innerHTML = `
+<div>Use WASD keys to move</div>
+<div>Press Enter to interact/confirm</div>
+`;
 
   const hearts = SoulHearts();
   const button = Button({ text: "* START GAME" });
-  button.style.margin = "0 auto";
 
   const enterListener = (event: KeyboardEvent) => {
     return event.key === "Enter" && onButtonClick();
@@ -71,7 +76,6 @@ const Intro = ({ nextView }: IntroProps) => {
 
   const onButtonClick = async () => {
     window.removeEventListener("keydown", enterListener);
-    controlsContainer.style.display = "none";
 
     button.disabled = true;
 
@@ -83,11 +87,15 @@ const Intro = ({ nextView }: IntroProps) => {
   };
 
   button.addEventListener("click", onButtonClick, { once: true });
-  controlsContainer.style.display = "block";
 
   const container = document.createElement("div");
-  container.append(hearts, button);
+  container.className = css.container;
 
+  const content = document.createElement("div");
+  content.className = css.content;
+  content.append(hearts, button, controls);
+
+  container.append(content);
   return container;
 };
 

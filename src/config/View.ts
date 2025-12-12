@@ -24,7 +24,7 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 5;
+  private currentLevel = 0;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,
@@ -84,9 +84,8 @@ export class View {
     );
   };
 
-  render() {
-    // this.container.append(Intro({ nextView: this.nextView }));
-    // return this.container;
-    this.gameOver();
+  async render() {
+    this.container.append(Intro({ nextView: this.nextView }));
+    return this.container;
   }
 }

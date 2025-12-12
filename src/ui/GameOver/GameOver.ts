@@ -29,8 +29,6 @@ export const GameOver = ({ onExit }: GameOverProps) => {
     soundEnabled: true,
   });
 
-  console.log("hello");
-
   const video = createElementWithClass<"video">("video", css.video);
   video.src = gameOverVideo;
   video.autoplay = true;

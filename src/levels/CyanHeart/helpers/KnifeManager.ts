@@ -39,11 +39,10 @@ export class KnifeManager {
     const KNIFE_SIZE = Knife.width * GLOBAL_SCALE;
     const SPACING = this.knifeSpacing * GLOBAL_SCALE;
 
-    const MAX_X = 8;
+    const MAX_X = 9;
 
-    const numKnivesY = Math.ceil(
-      this.app.renderer.height / (KNIFE_SIZE + SPACING)
-    );
+    const numKnivesY =
+      Math.ceil(this.app.renderer.height / (KNIFE_SIZE + SPACING)) + 1;
 
     for (let y = 0; y < numKnivesY; y++) {
       for (let x = 0; x < MAX_X; x++) {

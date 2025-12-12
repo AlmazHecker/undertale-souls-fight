@@ -26,7 +26,7 @@ export abstract class BaseGame extends EventEmitter<GameEvents> {
     public readonly heart: Heart,
     public readonly health: Health,
     protected readonly onFinish: () => void,
-    private readonly damage: number = -30
+    private readonly damage: number = -3
   ) {
     super();
     this.app.renderer.clear({ clear: true });

@@ -8,7 +8,6 @@ export class Pistol extends BaseItem {
 
   constructor(options: ItemOptions) {
     const sprite = new PIXI.Sprite(options.texture);
-    console.log(options.texture);
 
     super(sprite, options.x, options.y);
     this.container._zIndex = 2;

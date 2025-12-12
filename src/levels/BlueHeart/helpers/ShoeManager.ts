@@ -89,13 +89,13 @@ export class ShoeManager {
         if (isDamaged) collisions.push(shoe);
       }
 
-      this.startVerticalMovement(shoe, i);
+      this.startVerticalMovement(shoe);
     });
 
     return collisions;
   }
 
-  private startVerticalMovement(shoe: PIXI.Sprite, i: number) {
+  private startVerticalMovement(shoe: PIXI.Sprite) {
     const shoeHeightScaled = Shoe.height * GLOBAL_SCALE;
     const baselineY = HEIGHT - shoeHeightScaled / 2 - this.verticalAmplitude;
 

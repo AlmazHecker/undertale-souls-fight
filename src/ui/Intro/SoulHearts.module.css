@@ -1,9 +1,14 @@
+:root {
+  --radius: clamp(8rem, 12vw, 80rem);
+}
+
 .hearts {
   position: relative;
-  width: 350px;
-  height: 350px;
+  width: calc(var(--radius) * 2);
+  height: calc(var(--radius) * 2);
   margin: auto;
 }
+
 .hearts > div {
   position: absolute;
   display: grid;
@@ -12,11 +17,11 @@
     left 0.3s ease,
     top 0.3s ease;
   opacity: 0;
-  scale: 1.2;
 }
 
-:root {
-  --radius: 150px;
+.hearts > div svg {
+  width: clamp(2.5rem, 3vw, 12rem);
+  height: clamp(2.5rem, 3vw, 12rem);
 }
 
 .hearts > div:nth-of-type(1) {

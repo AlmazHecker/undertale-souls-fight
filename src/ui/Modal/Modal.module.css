@@ -12,8 +12,9 @@
 
 .modal-content {
   background-color: black;
-  border: 6px solid white;
-  padding: 10px 20px;
+  border: clamp(4px, 0.4vw, 32px) solid white;
+  padding: clamp(10px, 1vw, 4rem) clamp(20px, 1vw, 5rem);
+
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   white-space: nowrap;

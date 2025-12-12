@@ -6,7 +6,7 @@ import { createElementWithClass } from "@/utils/helpers/dom.helper.ts";
 const SoulHearts = () => {
   const container = createElementWithClass("div", css.hearts);
 
-  SOULS.map(() => {
+  SOULS.forEach(() => {
     const item = document.createElement("div");
     item.innerHTML = HeartIcon;
     container.append(item);

@@ -23,7 +23,6 @@ export class PurpleGame extends BaseGame {
     super(app, heart, health, onFinish);
     heart.maxHeightFromBottom = 0;
 
-    // making smaller area
     const activeWidth = Math.max(600, WIDTH * 0.65);
     const sideMargin = (WIDTH - activeWidth) / 2;
 
@@ -48,7 +47,7 @@ export class PurpleGame extends BaseGame {
   }
 
   startGameLoop() {
-    this.handleDamage(this.noteManager.infiniteNotesAnimation()); // works even after saving
+    this.handleDamage(this.noteManager.infiniteNotesAnimation());
     const collisions = this.textManager.infiniteTextAnimation();
 
     this.isBtnAndHeartColliding =
