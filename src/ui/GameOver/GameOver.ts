@@ -29,11 +29,14 @@ export const GameOver = ({ onExit }: GameOverProps) => {
     soundEnabled: true,
   });
 
+  console.log("hello");
+
   const video = createElementWithClass<"video">("video", css.video);
   video.src = gameOverVideo;
   video.autoplay = true;
   video.width = 800;
   video.height = 500;
+  video.controls = false;
 
   const handleEnterClick = (e: KeyboardEvent) => {
     if (e.key === "Enter") {

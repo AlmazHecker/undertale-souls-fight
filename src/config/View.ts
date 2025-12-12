@@ -24,7 +24,7 @@ export class View {
     GreenGame,
     YellowGame,
   ];
-  private currentLevel = 4;
+  private currentLevel = 5;
   constructor(
     private readonly container: HTMLElement,
     private readonly app: Application,
@@ -87,9 +87,6 @@ export class View {
   render() {
     // this.container.append(Intro({ nextView: this.nextView }));
     // return this.container;
-    const btn = document.createElement("button");
-    btn.textContent = "Next View";
-    btn.onclick = this.nextView;
-    this.container.appendChild(btn);
+    this.gameOver();
   }
 }

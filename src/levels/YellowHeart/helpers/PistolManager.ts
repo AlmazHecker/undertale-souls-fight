@@ -3,19 +3,16 @@ import { Application, Assets, Sprite, Texture } from "pixi.js";
 
 import {
   arePolygonsColliding,
-  getGlobalTicker,
   isOutOfCanvas,
 } from "@/utils/helpers/pixi.helper.ts";
-import {
-  callInfinitely,
-  sleep,
-  vibrate,
-  VibrateOptions,
-} from "@/utils/helpers/timing.helper.ts";
+import { vibrate } from "@/utils/helpers/timing.helper.ts";
 import { Pistol } from "@/levels/YellowHeart/assets/sprite/Pistol.ts";
 import { PistolAim } from "@/levels/YellowHeart/assets/sprite/PistolAim.ts";
 import { Bullet } from "@/levels/YellowHeart/assets/sprite/Bullet.ts";
 import { ActButton } from "@/utils/items/ActButton.ts";
+import { GLOBAL_SCALE, HEIGHT, WIDTH } from "@/config/engine";
+
+type BulletData = { bullet: Bullet | ActButton; aim: PistolAim; angle: number };
 
 export class PistolManager {
   public actButton = new ActButton();
@@ -27,8 +24,12 @@ export class PistolManager {
   private heartAimTexture!: Texture;
   private flowerTexture!: Texture;
   private bulletCount = 0;
-  private aimSleep = 250;
-  private bulletSleep = 100;
+  private activeBullets: BulletData[] = [];
+  private cycleTime = 0;
+  private cycleStage = 0;
+  private pistolAims: PistolAim[] = [];
+  private bulletSpeed = 13 * GLOBAL_SCALE;
+  private stepDuration = 12;
 
   constructor(
     private readonly app: Application,
@@ -37,8 +38,6 @@ export class PistolManager {
 
   async initialize() {
     await this.actButton.initialize();
-    const appCenterX = this.app.renderer.width / 2;
-    const appCenterY = this.app.renderer.height / 2;
 
     const assets = await Assets.loadBundle("yellow");
     this.aimTexture = assets.pistolAim;
@@ -48,31 +47,46 @@ export class PistolManager {
     const pistolTexture = assets.pistol;
 
     this.pistol = new Pistol({ texture: pistolTexture });
-    this.pistol.container.width = 160;
-    this.pistol.container.height = 144.16;
-    this.pistol.container.x = appCenterX;
-    this.pistol.container.y = appCenterY;
+    this.pistol.container.x = WIDTH / 2;
+    this.pistol.container.y = HEIGHT / 2;
+    this.pistol.centerWithPivot();
+    this.pistol.container.scale.set(GLOBAL_SCALE * 1.5);
 
     this.app.stage.addChild(this.pistol.container);
-
-    callInfinitely(this.pistolAnimation.bind(this), this.status !== "DESTROY");
   }
 
-  public async pistolAnimation() {
-    const positions = ["after", "before", "center"];
-    const pistolAims = [];
+  public pistolAnimation(delta: number) {
+    // if (this.cycleStage === 0 && this.activeBullets.length > 0) return;
 
-    for (const position of positions) {
-      pistolAims.push(await this.drawAim(position));
+    this.cycleTime += delta;
+
+    if (this.cycleTime < this.stepDuration) return;
+
+    this.cycleTime = 0;
+
+    if (this.cycleStage >= 0 && this.cycleStage <= 2) {
+      const positions = ["after", "before", "center"];
+      const position = positions[this.cycleStage];
+
+      const aim = this.drawAim(position);
+      this.pistolAims.push(aim);
+    } else if (this.cycleStage >= 3 && this.cycleStage <= 5) {
+      const index = this.cycleStage - 3;
+      const aim = this.pistolAims[index];
+
+      this.fireBullet(aim);
     }
-    for (let i = 0; i < 3; i++) {
-      await this.fireBullet(pistolAims[i]);
+
+    this.cycleStage++;
+
+    if (this.cycleStage > 5) {
+      this.cycleStage = 0;
+      this.pistolAims = [];
     }
   }
 
-  private async drawAim(position: string) {
-    const radius = 240;
-
+  private drawAim(position: string) {
+    const radius = 240 * GLOBAL_SCALE;
     const pistolAim = this.createPistolAim();
 
     const pistolX = this.pistol.container.x;
@@ -81,109 +95,93 @@ export class PistolManager {
     const heartX = this.heart.container.x;
     const heartY = this.heart.container.y;
 
-    let aimX = 0,
-      aimY = 0;
+    let aimX = heartX;
+    let aimY = heartY;
 
+    if (position === "after") {
+      aimX = heartX + radius;
+    }
+    if (position === "before") {
+      aimX = heartX - radius;
+    }
     if (this.status === "HELPING") {
-      const dx = heartX - pistolX;
-      const dy = heartY - pistolY;
-      const angle = Math.atan2(dy, dx);
-
-      const aimX = pistolX + radius * Math.cos(angle);
-      const aimY = pistolY + radius * Math.sin(angle);
-      // ЕСЛИ ЧЕЛ ПОПРОСИЛ О ПОМОЩИ, ТО СЛЕД ВЫСТРЕЛЫ
-      // БУДУТ ТОЛЬКО В ЕГО ПОЗИЦИЮ(хилка)
-      pistolAim.container.x = aimX;
-      pistolAim.container.y = aimY;
-
-      this.app.stage.addChild(pistolAim.container);
-      await sleep(this.aimSleep);
-      return pistolAim;
+      aimX = heartX;
+      aimY = heartY;
     }
 
-    switch (position) {
-      case "center":
-        aimX = heartX;
-        aimY = heartY;
-        break;
-      case "after":
-        aimX = heartX + radius * Math.cos(0); // Angle 0 (top)
-        aimY = heartY + radius * Math.sin(0); // Angle 0 (top)
-        break;
-      case "before":
-        aimX = heartX + radius * Math.cos(Math.PI); // Angle π (bottom)
-        aimY = heartY + radius * Math.sin(Math.PI); // Angle π (bottom)
-        break;
-    }
-
-    // START: СТАВИМ АИМ ТЕКСТУРУ В ОКРУЖНОСТЬ КРУГА
+    // Clamp within radius of pistol
     const dx = aimX - pistolX;
     const dy = aimY - pistolY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance > radius) {
-      const scale = radius / distance;
-      aimX = pistolX + dx * scale;
-      aimY = pistolY + dy * scale;
+    if (dist > radius) {
+      const s = radius / dist;
+      aimX = pistolX + dx * s;
+      aimY = pistolY + dy * s;
     }
-    // END: СТАВИМ АИМ ТЕКСТУРУ В ОКРУЖНОСТЬ КРУГА
 
     pistolAim.container.x = aimX;
     pistolAim.container.y = aimY;
 
     this.app.stage.addChild(pistolAim.container);
-    await sleep(this.aimSleep);
     return pistolAim;
   }
 
-  private async fireBullet(pistolAim: PistolAim) {
+  private fireBullet(aim: PistolAim) {
     this.bulletCount++;
-    await sleep(this.bulletSleep);
+
     const bullet = this.createBullet(
       this.pistol.container.x,
       this.pistol.container.y
     );
-    this.setBulletTrajectory(bullet, pistolAim);
+
+    const bx = bullet.container.x;
+    const by = bullet.container.y;
+
+    const ax = aim.container.x;
+    const ay = aim.container.y;
+
+    const angle = Math.atan2(ay - by, ax - bx);
+
+    bullet.container.rotation = angle;
+    this.pistol.container.rotation = angle;
 
     this.app.stage.addChild(bullet.container);
-    return bullet;
+
+    this.activeBullets.push({ bullet, aim, angle });
   }
 
-  private setBulletTrajectory(bullet: Bullet, pistolAim: PistolAim) {
-    const { x: bulletX, y: bulletY } = bullet.container;
-    const { x: aimX, y: aimY } = pistolAim.container;
-    const angle = Math.atan2(aimY - bulletY, aimX - bulletX);
+  private updateBullets() {
+    for (let i = this.activeBullets.length - 1; i >= 0; i--) {
+      const b = this.activeBullets[i];
 
-    this.pistol.container.rotation = angle;
-    bullet.container.rotation = angle;
+      b.bullet.container.x += Math.cos(b.angle) * this.bulletSpeed;
+      b.bullet.container.y += Math.sin(b.angle) * this.bulletSpeed;
 
-    const speed = 10;
-    const ticker = getGlobalTicker();
+      if (isOutOfCanvas(b.bullet.container, this.app)) {
+        b.aim.container.destroy();
 
-    ticker.add(() => {
-      bullet.container.x += Math.cos(angle) * speed;
-      bullet.container.y += Math.sin(angle) * speed;
-
-      if (isOutOfCanvas(bullet.container, this.app)) {
-        if (bullet.container.label !== "act-button") {
-          bullet.container.destroy();
+        if (b.bullet.container.label !== "act-button") {
+          b.bullet.container.destroy();
         }
-        pistolAim.container.destroy();
-        ticker.stop();
-      }
-    });
 
-    ticker.start();
+        this.activeBullets.splice(i, 1);
+      }
+    }
   }
 
   private createPistolAim() {
     let texture = this.aimTexture;
-    let size = 60;
+    let size = 60 * GLOBAL_SCALE;
     if (this.status === "HELPING") {
       texture = this.heartAimTexture;
-      size = 45;
+      size = 45 * GLOBAL_SCALE;
     }
-    return new PistolAim({ texture, width: size, height: size });
+    const aim = new PistolAim({ texture });
+    aim.centerWithPivot();
+    aim.container.width = size;
+    aim.container.height = size;
+    return aim;
   }
 
   private createBullet(x: number, y: number) {
@@ -195,17 +193,23 @@ export class PistolManager {
     }
 
     const bullet = new Bullet({ texture: this.bulletTexture, x, y });
+    bullet.container.width *= GLOBAL_SCALE;
+    bullet.container.height *= GLOBAL_SCALE;
+
     if (this.status === "HELPING") {
       bullet.container.texture = this.flowerTexture;
       bullet.container.tint = "#07a108";
-      bullet.container.width = 100;
-      bullet.container.height = 40.82;
+      bullet.container.width = 100 * GLOBAL_SCALE;
+      bullet.container.height = 40.82 * GLOBAL_SCALE;
     }
 
     return bullet;
   }
 
-  public checkCollisions() {
+  public checkCollisions(delta: number) {
+    this.pistolAnimation(delta);
+    this.updateBullets();
+
     const collisions: Sprite[] = [];
 
     this.app.stage.children.forEach((sprite) => {
@@ -218,13 +222,12 @@ export class PistolManager {
   }
 
   public preparingHelp() {
-    const options: VibrateOptions = {
+    return vibrate({
       container: this.pistol.container,
       duration: 3000,
       x: this.pistol.container.x,
       y: this.pistol.container.y,
-    };
-    return vibrate(options);
+    });
   }
 
   public async helpUser() {
@@ -234,6 +237,15 @@ export class PistolManager {
 
   public destroy() {
     this.status = "DESTROY";
+
+    this.activeBullets.forEach(({ bullet, aim }) => {
+      if (bullet.container.label !== "act-button") {
+        bullet.container.destroy();
+      }
+      aim.container.destroy();
+    });
+    this.activeBullets = [];
+
     this.pistol.container.destroy();
     this.app.stage.removeChild(this.pistol.container);
   }

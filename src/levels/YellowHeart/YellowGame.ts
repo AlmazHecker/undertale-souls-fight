@@ -4,6 +4,7 @@ import { Heart } from "@/utils/items/Heart.tsx";
 import { Health } from "@/ui/Health/Health.ts";
 import { PistolManager } from "@/levels/YellowHeart/helpers/PistolManager.ts";
 import { BaseGame } from "@/core/BaseGame.ts";
+import { getGlobalTicker } from "@/utils/helpers/pixi.helper";
 
 export class YellowGame extends BaseGame {
   private pistolManager: PistolManager;
@@ -12,7 +13,7 @@ export class YellowGame extends BaseGame {
     app: PIXI.Application,
     heart: Heart,
     health: Health,
-    onFinish: () => void,
+    onFinish: () => void
   ) {
     super(app, heart, health, onFinish, -5);
     heart.maxHeightFromBottom = 0;
@@ -22,21 +23,18 @@ export class YellowGame extends BaseGame {
   async initialize() {
     await this.pistolManager.initialize();
 
-    this.startGameLoop();
+    getGlobalTicker().add(this.startGameLoop, this);
 
-    this.ticker.start();
     return this;
   }
 
-  startGameLoop() {
-    this.ticker.add(() => {
-      const collisions = this.checkCollisions();
-      if (this.status === "HELPING") {
-        this.handleHeal(collisions);
-      } else {
-        this.handleDamage(collisions);
-      }
-    });
+  startGameLoop(ticker: PIXI.Ticker) {
+    const collisions = this.checkCollisions(ticker.deltaTime);
+    if (this.status === "HELPING") {
+      this.handleHeal(collisions);
+    } else {
+      this.handleDamage(collisions);
+    }
   }
 
   handleHeal(collisions: Sprite[]) {
@@ -59,15 +57,14 @@ export class YellowGame extends BaseGame {
     }, 6000);
   }
 
-  checkCollisions() {
+  checkCollisions(delta: number) {
     this.isBtnAndHeartColliding =
       this.pistolManager.actButton?.isCollidingWithHeart(this.heart);
-    return this.pistolManager.checkCollisions();
+    return this.pistolManager.checkCollisions(delta);
   }
 
   destroy(): Promise<void> | void {
     this.pistolManager.destroy();
-    this.ticker.stop();
-    this.ticker.destroy();
+    getGlobalTicker().remove(this.startGameLoop, this);
   }
 }
